@@ -7,16 +7,12 @@ public class Cinema {
     private final int seatsInRow;
     private final int rowsInCinema;
 
-    @Deprecated
-    private final String[][] availableSpacesInCinema;
-
     private final List<Ticket> soldTickets;
 
 
     public Cinema(int seatsInRow, int rowsInCinema) {
         this.seatsInRow = seatsInRow;
         this.rowsInCinema = rowsInCinema;
-        this.availableSpacesInCinema = new String[rowsInCinema + 1][seatsInRow + 1];
 
         soldTickets = new ArrayList<>();
     }
@@ -50,13 +46,18 @@ public class Cinema {
     }
 
 
-    public double getTicketPrice(int rowNumberToBuy, int discount) {
-        if (rowsInCinema * seatsInRow <= 60) {
-            return 10.0 - getDiscount(discount);
-        } else {
-            int frontHalfOfCinema = rowsInCinema / 2;
-            return rowNumberToBuy <= frontHalfOfCinema ? 10.0  - getDiscount(discount) : 8.0  - getDiscount(discount);
+    public double getTicketPrice(int discount, int movieChosen) {
+        switch (movieChosen) {
+            case 1:
+                return 8.99 - getDiscount(discount);
+            case 2:
+                return 9.99 - getDiscount(discount);
+            case 3:
+                return 6.99 - getDiscount(discount);
+            case 4:
+                return 4.99 - getDiscount(discount);
         }
+        return 0;
     }
 
     public double getDiscount(int kindOfDiscount) {
@@ -78,11 +79,41 @@ public class Cinema {
         soldTickets.add(ticket);
     }
 
-    public Statistics getStatistics() {
+    public Statistics getStatistics(int chosenMovie) {
 
-        return new Statistics(soldTickets.size(),getPercentage(), getCurrentIncome(),  getPotentialTotalIncome());
+        return new Statistics(soldTickets.size(),getPercentage(), getCurrentIncome(),  getPotentialTotalIncome(chosenMovie));
 
     }
+
+    public int getAllSoldTickets(Cinema movie1, Cinema movie2, Cinema movie3, Cinema movie4) {
+        return movie1.getStatistics(1).soldTicketAmount() +
+               movie2.getStatistics(2).soldTicketAmount() +
+               movie3.getStatistics(3).soldTicketAmount() +
+               movie4.getStatistics(4).soldTicketAmount();
+    }
+
+    public double getAllPercentSold(Cinema movie1, Cinema movie2, Cinema movie3, Cinema movie4) {
+        return (movie1.getStatistics(1).percentSold() +
+                movie2.getStatistics(2).percentSold() +
+                movie3.getStatistics(3).percentSold() +
+                movie4.getStatistics(4).percentSold()) / 4;
+    }
+
+    public double getAllMaxIncome(Cinema movie1, Cinema movie2, Cinema movie3, Cinema movie4) {
+        return movie1.getStatistics(1).maxIncome() +
+                movie2.getStatistics(2).maxIncome() +
+                movie3.getStatistics(3).maxIncome() +
+                movie4.getStatistics(4).maxIncome();
+    }
+
+    public double getAllIncome(Cinema movie1, Cinema movie2, Cinema movie3, Cinema movie4) {
+        return movie1.getStatistics(1).income() +
+                movie2.getStatistics(2).income() +
+                movie3.getStatistics(3).income() +
+                movie4.getStatistics(4).income();
+    }
+
+
 
     public double getPercentage() {
         if (Double.isNaN((double) soldTickets.size() / getTotalSeatsInCinema() * 100)) {
@@ -105,13 +136,7 @@ public class Cinema {
         return rowsInCinema * seatsInRow;
     }
 
-    public double getPotentialTotalIncome() {
-        if (rowsInCinema * seatsInRow <= 60) {
-            return rowsInCinema * seatsInRow * 10.0;
-        } else {
-            int frontHalfOfCinema = rowsInCinema / 2;
-            int backHalfOfCinema = rowsInCinema - frontHalfOfCinema;
-            return (frontHalfOfCinema * seatsInRow * 10.0) + (backHalfOfCinema * seatsInRow * 8.0);
-        }
+    public double getPotentialTotalIncome(int chosenMovie) {
+        return getTotalSeatsInCinema() * getTicketPrice(1, chosenMovie);
     }
 }

@@ -95,26 +95,17 @@ public class Main {
                 System.out.println("Number of purchased tickets: " + statistics.soldTicketAmount());
                 System.out.println("Percentage: " + String.format("%.2f", statistics.percentSold()) + "%");
                 System.out.println("Current  income: $" + statistics.income());
-                System.out.println("Total income: $" + String.format("%.2f", statistics.maxIncome()));
+                System.out.println("Total potential income: $" + String.format("%.2f", statistics.maxIncome()));
                 return;
             case 2:
                 System.out.println("Number of purchased tickets: " + allStatistics.getAllSoldTickets(godzillaMovie, duneMovie, interstellarMovie, ringMovie));
                 System.out.println("Percentage: " + String.format("%.2f", allStatistics.getAllPercentSold(godzillaMovie, duneMovie, interstellarMovie, ringMovie)) + "%");
                 System.out.println("Current  income: $" + allStatistics.getAllIncome(godzillaMovie, duneMovie, interstellarMovie, ringMovie));
-                System.out.println("Total income: $" + String.format("%.2f", allStatistics.getAllMaxIncome(godzillaMovie, duneMovie, interstellarMovie, ringMovie)));
+                System.out.println("Total potential income: $" + String.format("%.2f", allStatistics.getAllMaxIncome(godzillaMovie, duneMovie, interstellarMovie, ringMovie)));
                 return;
             default:
                 System.out.println("Invalid choice. Please try again.");
         }
-    }
-
-    private void printMovieStatistics(Cinema currentMovie, int chosenMovie) {
-        Statistics statistics = currentMovie.getStatistics(chosenMovie);
-
-        System.out.println("Number of purchased tickets: " + statistics.soldTicketAmount());
-        System.out.println("Percentage: " + String.format("%.2f", statistics.percentSold()) + "%");
-        System.out.println("Current  income: $" + statistics.income());
-        System.out.println("Total income: $" + String.format("%.2f", statistics.maxIncome()));
     }
 
     private void showSeats() {
@@ -139,7 +130,7 @@ public class Main {
     }
 
 
-    private void buyTicket(int movieChosen) {
+    private void buyTicket(int chosenMovie) {
         int rowNumberToBuy;
         int seatNumberToBuy;
         int amountToBuy;
@@ -187,9 +178,9 @@ public class Main {
 
                 break;
             }
-            System.out.println("\nTicket price: $" + selectedMovie.getTicketPrice(kindOfTicket, movieChosen));
+            System.out.println("\nTicket price: $" + selectedMovie.getTicketPrice(kindOfTicket, chosenMovie));
 
-            selectedMovie.bookSeat(rowNumberToBuy, seatNumberToBuy, kindOfTicket);
+            selectedMovie.bookSeat(rowNumberToBuy, seatNumberToBuy, kindOfTicket, chosenMovie);
         }
     }
 }

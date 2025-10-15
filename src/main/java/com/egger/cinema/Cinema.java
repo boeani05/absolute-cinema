@@ -74,8 +74,8 @@ public class Cinema {
         return 0;
     }
 
-    public void bookSeat(int row, int seat, int discount) {
-        Ticket ticket = new Ticket(row, seat, getTicketPrice(row, discount));
+    public void bookSeat(int row, int seat, int discount, int movieChosen) {
+        Ticket ticket = new Ticket(row, seat, getTicketPrice(discount, movieChosen));
         soldTickets.add(ticket);
     }
 

@@ -9,7 +9,6 @@ public class Main {
     private final Cinema duneMovie = new Cinema(5, 5);
     private final Cinema interstellarMovie = new Cinema(10, 10);
     private final Cinema ringMovie = new Cinema(5, 10);
-    private final Cinema allStatistics = new Cinema(0, 0);
     private Cinema selectedMovie;
     private Scanner scanner;
 
@@ -98,10 +97,7 @@ public class Main {
                 System.out.println("Total potential income: $" + String.format("%.2f", statistics.maxIncome()));
                 return;
             case 2:
-                System.out.println("Number of purchased tickets: " + allStatistics.getAllSoldTickets(godzillaMovie, duneMovie, interstellarMovie, ringMovie));
-                System.out.println("Percentage: " + String.format("%.2f", allStatistics.getAllPercentSold(godzillaMovie, duneMovie, interstellarMovie, ringMovie)) + "%");
-                System.out.println("Current  income: $" + allStatistics.getAllIncome(godzillaMovie, duneMovie, interstellarMovie, ringMovie));
-                System.out.println("Total potential income: $" + String.format("%.2f", allStatistics.getAllMaxIncome(godzillaMovie, duneMovie, interstellarMovie, ringMovie)));
+                System.out.println("All-halls statistics coming soon!");
                 return;
             default:
                 System.out.println("Invalid choice. Please try again.");
@@ -178,9 +174,14 @@ public class Main {
 
                 break;
             }
-            System.out.println("\nTicket price: $" + selectedMovie.getTicketPrice(kindOfTicket, chosenMovie));
 
-            selectedMovie.bookSeat(rowNumberToBuy, seatNumberToBuy, kindOfTicket, chosenMovie);
+
+            try {
+                selectedMovie.bookSeat(rowNumberToBuy, seatNumberToBuy, kindOfTicket, chosenMovie);
+                System.out.println("\nTicket price: $" + selectedMovie.getTicketPrice(kindOfTicket, chosenMovie));
+            } catch (AlreadyBookedException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 }

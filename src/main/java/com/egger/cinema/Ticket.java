@@ -1,6 +1,8 @@
 
 package com.egger.cinema;
 
-public record Ticket(int rowNr, int seatNr, double price){
+import java.math.BigDecimal;
+
+public record Ticket(int rowNr, int seatNr, BigDecimal price){
 
 }

@@ -1,4 +1,6 @@
 package com.egger.cinema;
 
-public record Statistics(int soldTicketAmount, double percentSold, double income, double maxIncome) {
+import java.math.BigDecimal;
+
+public record Statistics(int soldTicketAmount, double percentSold, BigDecimal income, BigDecimal maxIncome) {
 }

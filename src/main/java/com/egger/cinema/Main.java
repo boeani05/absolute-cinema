@@ -1,15 +1,11 @@
 package com.egger.cinema;
 
-import java.util.InputMismatchException;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-
-    private final Cinema godzillaMovie = new Cinema(10, 7);
-    private final Cinema duneMovie = new Cinema(5, 5);
-    private final Cinema interstellarMovie = new Cinema(10, 10);
-    private final Cinema ringMovie = new Cinema(5, 10);
-    private Cinema selectedMovie;
+    private Cinema megaplexx;
+    private Room selectedRoom;
     private Scanner scanner;
 
     public static void main(String[] args) {
@@ -20,42 +16,32 @@ public class Main {
     private void start() {
         scanner = new Scanner(System.in);
 
-        System.out.println("Welcome to Megaplexx! What movie would you like to see?\n1. Godzilla\n2. Dune\n3. Interstellar\n4. The Ring\n0. Exit");
+//        System.out.println("Welcome to Megaplexx! What movie would you like to see?\nA Godzilla\n2. Dune\n3. Interstellar\n4. The Ring\n0. Exit");
+        megaplexx = new Cinema();
+        System.out.println("Welcome to Megaplexx! What movie would you like to see?\n");
 
-        int chooseMovie;
+        for(Map.Entry<String, Room> entry: megaplexx.getRooms().entrySet()){
+            System.out.println(entry.getKey() + "\t" + entry.getValue().getMovieName() + "\n");
+        }
+
+        Room room;
+
         while (true) {
-            try {
-                chooseMovie = scanner.nextInt();
+                String input = scanner.next();
+
+                if("0".equals(input)){
+                    return;
+                }
+
+                room = megaplexx.getRoom(input);
+                if (room == null) {
+                    System.out.println("Invalid input, try again: ");
+                    continue;
+                }
                 break;
-            } catch (InputMismatchException e) {
-                System.out.println("Please enter a number: ");
-                scanner.next();
             }
-        }
 
-        while (chooseMovie < 0 || chooseMovie > 4) {
-            System.out.println("Invalid input, try again: ");
-            chooseMovie = scanner.nextInt();
-        }
-
-        switch (chooseMovie) {
-            case 1:
-                selectedMovie = godzillaMovie;
-                break;
-            case 2:
-                selectedMovie = duneMovie;
-                break;
-            case 3:
-                selectedMovie = interstellarMovie;
-                break;
-            case 4:
-                selectedMovie = ringMovie;
-                break;
-            case 0:
-                System.out.println("Thank you for visiting Megaplexx!");
-                System.exit(0);
-        }
-
+        selectedRoom = room;
 
 
         System.out.println("1. Show the seats\n2. Buy a ticket\n3. Statistics\n0. Choose another movie");
@@ -67,10 +53,10 @@ public class Main {
                     showSeats();
                     break;
                 case 2:
-                    buyTicket(chooseMovie);
+                    buyTicket();
                     break;
                 case 3:
-                    printStatistics(chooseMovie);
+                    printStatistics();
                     break;
                 case 0:
                     start();
@@ -82,14 +68,14 @@ public class Main {
         }
     }
 
-    private void printStatistics(int chosenMovie) {
+    private void printStatistics() {
 
         System.out.println("1. Show statistics of current movie hall\n2. Show statistics of all movie halls");
         int choiceStatistics = scanner.nextInt();
 
         switch (choiceStatistics) {
             case 1:
-                Statistics statistics = selectedMovie.getStatistics(chosenMovie);
+                Statistics statistics = selectedRoom.getStatistics();
 
                 System.out.println("Number of purchased tickets: " + statistics.soldTicketAmount());
                 System.out.println("Percentage: " + String.format("%.2f", statistics.percentSold()) + "%");
@@ -107,15 +93,15 @@ public class Main {
     private void showSeats() {
         System.out.println("\nCinema:");
 
-        for (int i = 0; i <= selectedMovie.getRowsInCinema(); i++) {
-            for (int j = 0; j <= selectedMovie.getSeatsInRow(); j++) {
+        for (int i = 0; i <= selectedRoom.getRowsInHall(); i++) {
+            for (int j = 0; j <= selectedRoom.getSeatsPerRow(); j++) {
                 if (i == 0 && j == 0) {
                     System.out.print("  ");
                 } else if (i == 0) {
                     System.out.print(j + " ");
                 } else if (j == 0) {
                     System.out.print(i + " ");
-                } else if (selectedMovie.isSeatAvailable(i, j)) {
+                } else if (selectedRoom.isSeatAvailable(i, j)) {
                     System.out.print("S ");
                 } else {
                     System.out.print("B ");
@@ -126,34 +112,33 @@ public class Main {
     }
 
 
-    private void buyTicket(int chosenMovie) {
+    private void buyTicket() {
         int rowNumberToBuy;
         int seatNumberToBuy;
         int amountToBuy;
-        int kindOfTicket;
-
+        int discountCode;
 
 
         System.out.println("How many tickets do you want to buy?");
         amountToBuy = scanner.nextInt();
 
-        while (amountToBuy > selectedMovie.getTotalSeatsInCinema()) {
+        while (amountToBuy > selectedRoom.getAllSeatsInHall()) {
             System.out.println("This cinema hall doesn't support this much seats!\nEnter again: ");
             amountToBuy = scanner.nextInt();
         }
 
         for (int ticketNr = 1; ticketNr <= amountToBuy; ticketNr++) {
             System.out.println("What kind of ticket(s) do you want to buy?\n1. Regular\n2. Child\n3. Senior\n4. Student\n0. Cancel");
-            kindOfTicket = scanner.nextInt();
+            discountCode = scanner.nextInt();
 
-            if (kindOfTicket == 0) {
+            if (discountCode == 0) {
                 System.out.println("Transaction cancelled.");
                 return;
             }
 
-            while (kindOfTicket < 1 || kindOfTicket > 4) {
+            while (discountCode < 1 || discountCode > 4) {
                 System.out.println("Invalid input, enter again: ");
-                kindOfTicket = scanner.nextInt();
+                discountCode = scanner.nextInt();
             }
 
             while (true) {
@@ -162,12 +147,12 @@ public class Main {
                 System.out.println("Enter a seat number in that row:");
                 seatNumberToBuy = scanner.nextInt();
 
-                if (!selectedMovie.isSeatValid(rowNumberToBuy, seatNumberToBuy)) {
+                if (!selectedRoom.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
                     System.out.println("\nWrong input!");
                     continue;
                 }
 
-                if (!selectedMovie.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
+                if (!selectedRoom.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
                     System.out.println("\nThat ticket has already been purchased!");
                     continue;
                 }
@@ -177,11 +162,12 @@ public class Main {
 
 
             try {
-                selectedMovie.bookSeat(rowNumberToBuy, seatNumberToBuy, kindOfTicket, chosenMovie);
-                System.out.println("\nTicket price: $" + selectedMovie.getTicketPrice(kindOfTicket, chosenMovie));
+                Ticket boughtTicket = selectedRoom.book(rowNumberToBuy, seatNumberToBuy, discountCode);
+                System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
             } catch (AlreadyBookedException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
+
 }

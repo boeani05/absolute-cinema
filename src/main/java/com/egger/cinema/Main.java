@@ -15,18 +15,18 @@ public class Main {
 
     private void start() {
         scanner = new Scanner(System.in);
-
-//        System.out.println("Welcome to Megaplexx! What movie would you like to see?\nA Godzilla\n2. Dune\n3. Interstellar\n4. The Ring\n0. Exit");
         megaplexx = new Cinema();
+
         System.out.println("Welcome to Megaplexx! What movie would you like to see?\n");
 
-        for(Map.Entry<String, Room> entry: megaplexx.getRooms().entrySet()){
-            System.out.println(entry.getKey() + "\t" + entry.getValue().getMovieName() + "\n");
-        }
-
-        Room room;
-
         while (true) {
+            for(Map.Entry<String, Room> entry: megaplexx.getRooms().entrySet()){
+                System.out.println(entry.getKey() + "\t" + entry.getValue().getMovieName());
+            }
+
+            Room room;
+
+            while (true) {
                 String input = scanner.next();
 
                 if("0".equals(input)){
@@ -41,49 +41,47 @@ public class Main {
                 break;
             }
 
-        selectedRoom = room;
+            selectedRoom = room;
 
 
-        System.out.println("1. Show the seats\n2. Buy a ticket\n3. Statistics\n0. Choose another movie");
-        int choice = scanner.nextInt();
+            System.out.println("1. Show the seats\n2. Buy a ticket\n3. Statistics\n4. Refund ticket\n0. Choose another movie");
+            int choice = scanner.nextInt();
 
-        while (true) {
-            switch (choice) {
-                case 1:
-                    showSeats();
-                    break;
-                case 2:
-                    buyTicket();
-                    break;
-                case 3:
-                    printStatistics();
-                    break;
-                case 0:
-                    start();
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+            while (choice != 0) {
+                switch (choice) {
+                    case 1:
+                        showSeats();
+                        break;
+                    case 2:
+                        buyTicket();
+                        break;
+                    case 3:
+                        printStatistics();
+                        break;
+                    case 4:
+                        refundTicket();
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+                System.out.println("\n1. Show the seats\n2. Buy a ticket\n3. Statistics\n4. Refund ticket\n0. Choose another movie");
+                choice = scanner.nextInt();
             }
-            System.out.println("\n1. Show the seats\n2. Buy a ticket\n3. Statistics\n0. Choose another movie");
-            choice = scanner.nextInt();
         }
+
     }
 
     private void printStatistics() {
 
-        System.out.println("1. Show statistics of current movie hall\n2. Show statistics of all movie halls");
+        System.out.println("1. Show statistics of current movie hall\n2. Show statistics of whole cinema");
         int choiceStatistics = scanner.nextInt();
 
         switch (choiceStatistics) {
             case 1:
-                Statistics statistics = selectedRoom.getStatistics();
-
-                System.out.println("Number of purchased tickets: " + statistics.soldTicketAmount());
-                System.out.println("Percentage: " + String.format("%.2f", statistics.percentSold()) + "%");
-                System.out.println("Current  income: $" + statistics.income());
-                System.out.println("Total potential income: $" + String.format("%.2f", statistics.maxIncome()));
+                System.out.println(selectedRoom.getStatistics().toString());
                 return;
             case 2:
-                System.out.println("All-halls statistics coming soon!");
+                System.out.println(megaplexx.getAllStatistics().toString());
                 return;
             default:
                 System.out.println("Invalid choice. Please try again.");
@@ -163,10 +161,29 @@ public class Main {
 
             try {
                 Ticket boughtTicket = selectedRoom.book(rowNumberToBuy, seatNumberToBuy, discountCode);
-                System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
+                System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price().doubleValue()));
             } catch (AlreadyBookedException e) {
                 System.out.println(e.getMessage());
             }
+        }
+    }
+
+    public void refundTicket() {
+        System.out.println("What seat would you like to refund?\nRow:");
+        int refundRow = scanner.nextInt();
+        System.out.println("Seat:");
+        int refundSeat = scanner.nextInt();
+
+        if (!selectedRoom.isValidSeat(refundRow, refundSeat)) {
+            System.out.println("Invalid seat");
+            return;
+        }
+
+        try {
+            Ticket refunded = selectedRoom.refund(refundRow, refundSeat);
+            System.out.println("Refunded: $" + String.format("%.2f", refunded.price().doubleValue()));
+        } catch (NotBookedException e) {
+            System.out.println(e.getMessage());
         }
     }
 

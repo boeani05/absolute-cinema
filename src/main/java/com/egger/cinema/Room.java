@@ -12,6 +12,7 @@ public class Room {
     private final Map<Integer, BigDecimal> discountCode;
 
 
+
     //Constructor
     public Room(String movieName, int rowsInHall, int seatsPerRow, BigDecimal basePrice) {
         this.movieName = movieName;
@@ -22,7 +23,7 @@ public class Room {
         this.basePrice = basePrice;
         this.discountCode = new TreeMap<>();
 
-        discountCode.put(1, new BigDecimal("0.0"));
+        discountCode.put(1, BigDecimal.valueOf(0));
         discountCode.put(2, BigDecimal.valueOf(3.99));
         discountCode.put(3, BigDecimal.valueOf(1.99));
         discountCode.put(4, BigDecimal.valueOf(2.99));
@@ -31,11 +32,7 @@ public class Room {
     //Check if input is an existing/valid seat
     public boolean isValidSeat(int selectedRow, int selectedSeatInRow) {
 
-        if (selectedRow < 1 || selectedRow > rowsInHall || selectedSeatInRow < 1 || selectedSeatInRow > seatsPerRow) {
-            return false;
-        }
-
-        return true;
+        return selectedRow >= 1 && selectedRow <= rowsInHall && selectedSeatInRow >= 1 && selectedSeatInRow <= seatsPerRow;
 
     }
 
@@ -55,10 +52,28 @@ public class Room {
             throw new AlreadyBookedException("Seat " + selectedSeatInRow + " in row " + selectedRow + " is already booked!");
         }
         //book ticket, if all tests passed
-        Ticket ticket = new Ticket(selectedRow, selectedSeatInRow, getTicketPrice(discountCode)); // TODO: fix price later
+        Ticket ticket = new Ticket(selectedRow, selectedSeatInRow, getTicketPrice(discountCode));
         //put the seatid(key) and the ticket(value) in bookings map
         bookings.put(new SeatId(selectedRow, selectedSeatInRow), ticket);
         return ticket;
+    }
+
+    public Ticket refund(int selectedRow, int selectedSeat) throws NotBookedException {
+        if (!isValidSeat(selectedRow, selectedSeat)) {
+            throw new IllegalStateException("Invalid seat!");
+        }
+
+        SeatId id = new SeatId(selectedRow, selectedSeat);
+
+        Ticket refunding = bookings.get(id);
+
+        if (refunding == null) {
+            throw new NotBookedException("Seat " + selectedSeat + " in row " + selectedRow + " is not booked yet!");
+        }
+
+        bookings.remove(id);
+
+        return refunding;
     }
 
     public List<Ticket> getTickets() {
@@ -105,15 +120,19 @@ public class Room {
         return new Statistics(getSoldTickets(), getSoldTicketsInPercent(), getIncome(), getPotentialIncome());
     }
 
-    public BigDecimal getTicketPrice(int discountCode) {
-        return this.basePrice.subtract(getDiscountValue(discountCode));
+    public BigDecimal getTicketPrice(int code) {
+        BigDecimal price = basePrice.subtract(getDiscountValue(code));
+
+        if (price.signum() < 0) price = BigDecimal.ZERO;
+        return price;
     }
 
-    public BigDecimal getDiscountValue(int discountCode) {
-        try {
-            return this.discountCode.get(discountCode);
-        } catch (IllegalArgumentException e) {
-            return null;
+    public BigDecimal getDiscountValue(int code) {
+        BigDecimal d = discountCode.get(code);
+
+        if (d == null) {
+            throw new IllegalArgumentException("Invalid discount code: " + code);
         }
+        return d;
     }
 }

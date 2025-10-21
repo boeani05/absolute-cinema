@@ -19,8 +19,47 @@ public class Main {
 
         System.out.println("Welcome to Megaplexx!");
 
-        while (true) {
+        System.out.println("""
+                
+                1. Show all events
+                2. Show rooms for event
+                3. Buy ticket for an event
+                4. Refund ticket
+                5. Show events by date
+                6. Statistics
+                7. Admin Panel
+                0. Exit
+                """);
+        int choice = scanner.nextInt();
+
+        while (choice != 0) {
+            switch (choice) {
+                case 1:
+                    showAllEvents();
+                    break;
+                case 2:
+                    showRoomsForEvent();
+                    break;
+                case 3:
+                    buyTicketForEvent();
+                    break;
+                case 4:
+                    refundTicketForEvent();
+                    break;
+                case 5:
+                    showEventsByDate();
+                    break;
+                case 6:
+                    printStatistics();
+                    break;
+                case 7:
+                    showAdminPanel();
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
             System.out.println("""
+                    
                     1. Show all events
                     2. Show rooms for event
                     3. Buy ticket for an event
@@ -30,49 +69,9 @@ public class Main {
                     7. Admin Panel
                     0. Exit
                     """);
-            int choice = scanner.nextInt();
-
-            while (choice != 0) {
-                switch (choice) {
-                    case 1:
-                        showAllEvents();
-                        break;
-                    case 2:
-                        showRoomsForEvent();
-                        break;
-                    case 3:
-                        buyTicketForEvent();
-                        break;
-                    case 4:
-                        refundTicketForEvent();
-                        break;
-                    case 5:
-                        showEventsByDate();
-                        break;
-                    case 6:
-                        printStatistics();
-                        break;
-                    case 7:
-                        showAdminPanel();
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
-                }
-                System.out.println("""
-                        1. Show all events
-                        2. Show rooms for event
-                        3. Buy ticket for an event
-                        4. Refund ticket
-                        5. Show events by date
-                        6. Statistics
-                        7. Admin Panel
-                        0. Exit
-                        """);
-                choice = scanner.nextInt();
-            }
-            return;
+            choice = scanner.nextInt();
         }
-
+        System.out.println("Thank you for visiting Megaplexx! Goodbye!");
     }
 
     private void printStatistics() {
@@ -109,7 +108,7 @@ public class Main {
             return;
         }
 
-
+        System.out.println("\n📅" + LocalDate.now() + "\n");
         for (CinemaEvent event : sorted) {
             System.out.println(counter++ + ". " + event.toString() + "\n");
         }
@@ -131,7 +130,7 @@ public class Main {
         amountToBuy = scanner.nextInt();
 
         while (amountToBuy > room.getAllSeatsInHall()) {
-            System.out.println("This cinema hall doesn't support this much seats!\nEnter again: ");
+            System.out.println("This cinema hall doesn't support this much seats!\n\nEnter again: ");
             amountToBuy = scanner.nextInt();
         }
 
@@ -150,9 +149,9 @@ public class Main {
             }
 
             while (true) {
-                System.out.println("\nEnter a row number:");
+                System.out.println("\nEnter a row number (1 - " + room.getRowsInHall() + "):");
                 rowNumberToBuy = scanner.nextInt();
-                System.out.println("Enter a seat number in that row:");
+                System.out.println("Enter a seat number in that row (1 - " + room.getSeatsPerRow() + "):");
                 seatNumberToBuy = scanner.nextInt();
 
                 if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
@@ -226,6 +225,7 @@ public class Main {
     }
 
     public void showAllEvents() {
+        int counter = 1;
         List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
         sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
 
@@ -236,10 +236,10 @@ public class Main {
 
             if (!eventDate.equals(currentDate)) {
                 currentDate = eventDate;
-                System.out.println("\n📅 " + eventDate);
+                System.out.println("\n📅 " + eventDate + "\n");
             }
 
-            System.out.println(" " + e + "\n");
+            System.out.println(counter++ + ". " + e + "\n");
         }
     }
 
@@ -270,6 +270,8 @@ public class Main {
         sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
         int counter = 1;
 
+        System.out.println("\n📅 " + LocalDate.now() + "\n");
+
         for (CinemaEvent event : sorted) {
             System.out.println(counter++ + ". " + event.toString() + "\n");
         }
@@ -288,6 +290,14 @@ public class Main {
     }
 
     public void showAdminPanel() {
-        System.out.println("Admin Panel is currently under construction.");
+        System.out.println("Enter username:");
+        String username = scanner.next();
+        System.out.println("Enter password:");
+        String password = scanner.next();
+        if (!megaplexx.authenticateAdmin(username, password)) {
+            System.out.println("Invalid credentials!");
+            return;
+        }
+        megaplexx.printAdminView();
     }
 }

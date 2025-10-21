@@ -93,14 +93,17 @@ public class Room {
         return roomId;
     }
 
+    @SuppressWarnings("unused")
     public Movie getMovie() {
         return movie;
     }
 
+    @SuppressWarnings("unused")
     public void setEvent(CinemaEvent event) {
         this.event = event;
     }
 
+    @SuppressWarnings("unused")
     public CinemaEvent getEvent() {
         return event;
     }
@@ -113,6 +116,7 @@ public class Room {
         return seatsPerRow;
     }
 
+    @SuppressWarnings("unused")
     public Map<Integer, Double> getDiscountCode() {
         return discountCode;
     }

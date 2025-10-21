@@ -34,6 +34,7 @@ public class Movies {
         return all;
     }
 
+    @SuppressWarnings("unused")
     public Movie get(String title) {
         if (title == null) return null;
         return byId.get(title.toLowerCase(Locale.ROOT));
@@ -47,5 +48,9 @@ public class Movies {
                     .append(" (").append(m.genre()).append(")\n");
         }
         return sb.toString();
+    }
+
+    public List<Movie> getAll() {
+        return all;
     }
 }

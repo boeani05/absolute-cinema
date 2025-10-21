@@ -43,6 +43,7 @@ public class Cinema {
         events.addAll(List.of(e1, e2, e3, e4));
     }
 
+    @SuppressWarnings("unused")
     public Room getRoom(String id) {
         if (id == null) return null;
         return rooms.get(id.toUpperCase(Locale.ROOT));
@@ -109,6 +110,7 @@ public class Cinema {
         return sb.toString();
     }
 
+    @SuppressWarnings("unused")
     public void addEvent(CinemaEvent event) {
         if (!events.contains(event)) {
             events.add(event);
@@ -125,5 +127,20 @@ public class Cinema {
         Random random = new Random();
         int index = random.nextInt(movies.size());
         return movies.get(index);
+    }
+
+    public void printAdminView() {
+        System.out.println("Available Movies:");
+        for (Movie movie : movies.getAll()) {
+            System.out.printf("Title: %s, Genre: %s, Duration: %d minutes, Rating: %.1f, Base Price: $%.2f%n%n",
+                    movie.title(), movie.genre(), movie.durationMinutes(), movie.rating(), movie.basePrice());
+        }
+    }
+
+    public boolean authenticateAdmin(String username, String password) {
+        final String ADMIN_USERNAME = "admin";
+        final String ADMIN_PASSWORD = "password123";
+
+        return ADMIN_USERNAME.equals(username) && ADMIN_PASSWORD.equals(password);
     }
 }

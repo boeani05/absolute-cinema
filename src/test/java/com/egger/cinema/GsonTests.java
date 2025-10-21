@@ -1,6 +1,5 @@
 package com.egger.cinema;
 
-import org.assertj.core.groups.Tuple;
 import org.junit.Test;
 import java.io.InputStream;
 import java.util.List;
@@ -35,7 +34,14 @@ public class GsonTests {
                             tuple("Pulp Fiction", 154, 13.99, 8.9, "Crime"),
                             tuple("The Dark Knight", 152, 15.99, 9.0, "Action"),
                             tuple("Forrest Gump", 142, 11.99, 8.8, "Drama"),
-                            tuple("The Matrix", 136, 13.49, 8.7, "Science Fiction")
+                            tuple("The Matrix", 136, 13.49, 8.7, "Science Fiction"),
+                            tuple("Interstellar", 169, 16.99, 8.6, "Science Fiction"),
+                            tuple("Gladiator", 155, 12.49, 8.5, "Action"),
+                            tuple("The Shawshank Redemption", 142, 10.99, 9.3, "Drama"),
+                            tuple("Fight Club", 139, 11.49, 8.8, "Drama"),
+                            tuple("The Lord of the Rings: The Fellowship of the Ring", 178, 14.49, 8.8, "Fantasy" ),
+                            tuple("Avatar", 162, 13.99, 7.8, "Science Fiction"),
+                            tuple("Titanic", 195, 12.99, 7.8, "Romance")
                     );
 
             for (Movie movie : movies) {

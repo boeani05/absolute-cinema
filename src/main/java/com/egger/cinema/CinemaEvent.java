@@ -2,9 +2,7 @@ package com.egger.cinema;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -22,6 +20,7 @@ public class CinemaEvent {
         this.bookings = new ConcurrentHashMap<>();
     }
 
+    @SuppressWarnings("unused")
     public Movie getMovie() {
         return movie;
     }
@@ -43,11 +42,8 @@ public class CinemaEvent {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CinemaEvent)) return false;
-
-        CinemaEvent that = (CinemaEvent) o;
-        String thisRoomId = that.room != null ? that.room.getRoomId() : null;
-        String thatRoomId = that.room != null ? that.room.getRoomId() : null;
+        if (!(o instanceof CinemaEvent that)) return false;
+        assert room != null;
         return Objects.equals(movie.id(), that.movie.id()) &&
                 Objects.equals(room.getRoomId(), that.room.getRoomId()) &&
                 Objects.equals(startTime, that.startTime);
@@ -55,7 +51,6 @@ public class CinemaEvent {
 
     @Override
     public int hashCode() {
-        String roomId = room != null ? room.getRoomId() : null;
         assert room != null;
         return Objects.hash(movie.id(), room.getRoomId(), startTime);
     }
@@ -96,7 +91,7 @@ public class CinemaEvent {
     }
 
     public Collection<Ticket> getTickets() {
-        return Collections.unmodifiableList(new ArrayList<>(bookings.values()));
+        return java.util.List.copyOf(bookings.values());
     }
 
     public ConcurrentMap<SeatId, Ticket> getBookings() {

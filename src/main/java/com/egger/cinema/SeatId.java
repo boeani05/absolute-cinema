@@ -10,13 +10,13 @@ public record SeatId(int row, int seat) implements Comparable<SeatId> {
     @Override
     public int compareTo(SeatId o) {
         if(o == null){
-            return -1;
+            throw new NullPointerException("SeatId cannot be null");
         }
 
-        int result = Integer.compare(row, o.row);
+        int result = Integer.compare(this.row, o.row);
 
         if(result == 0){
-            result = Integer.compare(seat, o.seat);
+            result = Integer.compare(this.seat, o.seat);
         }
 
         return result;

@@ -1,0 +1,9 @@
+com\egger\cinema\AlreadyBookedException.class
+com\egger\cinema\Statistics.class
+com\egger\cinema\SeatId.class
+com\egger\cinema\Ticket.class
+com\egger\cinema\Main.class
+com\egger\cinema\Room.class
+com\egger\cinema\NotBookedException.class
+com\egger\cinema\Movie.class
+com\egger\cinema\Cinema.class

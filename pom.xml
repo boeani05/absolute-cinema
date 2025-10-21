@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.egger</groupId>
+    <artifactId>absolute-cinema</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+    </properties>
+
+    <repositories>
+        <!-- local artifactory -->
+        <repository>
+            <id>com.egger</id>
+            <url>https://repo.egger.com/artifactory/libs-release</url>
+        </repository>
+
+        <repository>
+            <id>com.egger-remote</id>
+            <url>https://repo.egger.com/artifactory/remote-repos/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <!-- local artifactory -->
+        <pluginRepository>
+            <id>com.egger</id>
+            <url>https://repo.egger.com/artifactory/libs-release</url>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>com.egger-remote</id>
+            <url>https://repo.egger.com/artifactory/remote-repos/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.13.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.27.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,30 @@
+[
+  {
+    "movieName": "Godzilla",
+    "durationMinutes": 123,
+    "basePrice": 9.99,
+    "rating": 7.9,
+    "genre": "action"
+  },
+  {
+    "movieName": "Dune",
+    "durationMinutes": 155,
+    "basePrice": 5.99,
+    "rating": 7.7,
+    "genre": "sci-fi"
+  },
+  {
+    "movieName": "Interstellar",
+    "durationMinutes": 169,
+    "basePrice": 7.99,
+    "rating": 9.2,
+    "genre": "sci-fi"
+  },
+  {
+    "movieName": "The Ring",
+    "durationMinutes": 105,
+    "basePrice": 4.99,
+    "rating": 7.3,
+    "genre": "horror"
+  }
+]

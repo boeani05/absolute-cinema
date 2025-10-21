@@ -1,11 +1,11 @@
 package com.egger.cinema;
 
-import java.util.Map;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 
 public class Main {
     private Cinema megaplexx;
-    private Room selectedRoom;
     private Scanner scanner;
 
     public static void main(String[] args) {
@@ -17,110 +17,110 @@ public class Main {
         scanner = new Scanner(System.in);
         megaplexx = new Cinema();
 
-        System.out.println("Welcome to Megaplexx! What movie would you like to see?\n");
+        System.out.println("Welcome to Megaplexx!");
 
         while (true) {
-            for(Map.Entry<String, Room> entry: megaplexx.getRooms().entrySet()){
-                System.out.println(entry.getKey() + "\t" + entry.getValue().getMovieName());
-            }
-
-            Room room;
-
-            while (true) {
-                String input = scanner.next();
-
-                if("0".equals(input)){
-                    return;
-                }
-
-                room = megaplexx.getRoom(input);
-                if (room == null) {
-                    System.out.println("Invalid input, try again: ");
-                    continue;
-                }
-                break;
-            }
-
-            selectedRoom = room;
-
-
-            System.out.println("1. Show the seats\n2. Buy a ticket\n3. Statistics\n4. Refund ticket\n0. Choose another movie");
+            System.out.println("""
+                    1. Show all events
+                    2. Buy ticket for an event
+                    3. Refund ticket
+                    4. Show events by date
+                    5. Statistics
+                    0. Exit
+                    """);
             int choice = scanner.nextInt();
 
             while (choice != 0) {
                 switch (choice) {
                     case 1:
-                        showSeats();
+                        showAllEvents();
                         break;
                     case 2:
-                        buyTicket();
+                        buyTicketForEvent();
                         break;
                     case 3:
-                        printStatistics();
+                        refundTicketForEvent();
                         break;
                     case 4:
-                        refundTicket();
+                        showEventsByDate();
+                        break;
+                    case 5:
+                        printStatistics();
                         break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
                 }
-                System.out.println("\n1. Show the seats\n2. Buy a ticket\n3. Statistics\n4. Refund ticket\n0. Choose another movie");
+                System.out.println("""
+                        1. Show all events
+                        2. Buy ticket for an event
+                        3. Refund ticket
+                        4. Show events by date
+                        5. Statistics
+                        0. Exit
+                        """);
                 choice = scanner.nextInt();
             }
+            return;
         }
 
     }
 
     private void printStatistics() {
 
-        System.out.println("1. Show statistics of current movie hall\n2. Show statistics of whole cinema");
+        System.out.println("1. Show statistics of whole cinema\n2. Show statistics in a per-room table");
         int choiceStatistics = scanner.nextInt();
 
         switch (choiceStatistics) {
             case 1:
-                System.out.println(selectedRoom.getStatistics().toString());
-                return;
+                System.out.println(megaplexx.getAllStatistics());
+                break;
             case 2:
-                System.out.println(megaplexx.getAllStatistics().toString());
-                return;
+                System.out.println(megaplexx.getPerRoomStatisticsTable());
+                break;
             default:
                 System.out.println("Invalid choice. Please try again.");
         }
     }
 
-    private void showSeats() {
-        System.out.println("\nCinema:");
 
-        for (int i = 0; i <= selectedRoom.getRowsInHall(); i++) {
-            for (int j = 0; j <= selectedRoom.getSeatsPerRow(); j++) {
-                if (i == 0 && j == 0) {
-                    System.out.print("  ");
-                } else if (i == 0) {
-                    System.out.print(j + " ");
-                } else if (j == 0) {
-                    System.out.print(i + " ");
-                } else if (selectedRoom.isSeatAvailable(i, j)) {
-                    System.out.print("S ");
-                } else {
-                    System.out.print("B ");
-                }
-            }
-            System.out.println();
-        }
-    }
-
-
-    private void buyTicket() {
+    private void buyTicketForEvent() {
+        int eventToBuy;
         int rowNumberToBuy;
         int seatNumberToBuy;
         int amountToBuy;
         int discountCode;
+        int counter;
+        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
+        counter = 1;
+
+        if (sorted.isEmpty()) {
+            System.out.println("No events registered!");
+            return;
+        }
+
+
+        for (CinemaEvent event : sorted) {
+            System.out.println(counter++ + ". " + event.toString() + "\n");
+        }
+
+        System.out.println("Which event would you like to book a seat for?");
+        eventToBuy = scanner.nextInt();
+
+        while (eventToBuy < 1 || eventToBuy > sorted.size()) {
+            System.out.println("Please enter a valid event!");
+            eventToBuy = scanner.nextInt();
+        }
+
+        CinemaEvent selectedEvent = sorted.get(eventToBuy - 1);
+
+        Room room = selectedEvent.getRoom();
 
 
         System.out.println("How many tickets do you want to buy?");
         amountToBuy = scanner.nextInt();
 
-        while (amountToBuy > selectedRoom.getAllSeatsInHall()) {
+        while (amountToBuy > room.getAllSeatsInHall()) {
             System.out.println("This cinema hall doesn't support this much seats!\nEnter again: ");
             amountToBuy = scanner.nextInt();
         }
@@ -145,12 +145,12 @@ public class Main {
                 System.out.println("Enter a seat number in that row:");
                 seatNumberToBuy = scanner.nextInt();
 
-                if (!selectedRoom.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
+                if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
                     System.out.println("\nWrong input!");
                     continue;
                 }
 
-                if (!selectedRoom.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
+                if (!selectedEvent.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
                     System.out.println("\nThat ticket has already been purchased!");
                     continue;
                 }
@@ -160,31 +160,101 @@ public class Main {
 
 
             try {
-                Ticket boughtTicket = selectedRoom.book(rowNumberToBuy, seatNumberToBuy, discountCode);
-                System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price().doubleValue()));
+                Ticket boughtTicket = selectedEvent.book(rowNumberToBuy, seatNumberToBuy, discountCode);
+                System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
             } catch (AlreadyBookedException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
 
-    public void refundTicket() {
-        System.out.println("What seat would you like to refund?\nRow:");
-        int refundRow = scanner.nextInt();
-        System.out.println("Seat:");
-        int refundSeat = scanner.nextInt();
+    public void refundTicketForEvent() {
+        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
 
-        if (!selectedRoom.isValidSeat(refundRow, refundSeat)) {
-            System.out.println("Invalid seat");
+        if (sorted.isEmpty()) {
+            System.out.println("No events registered!");
             return;
         }
 
+        int counter = 1;
+        for (CinemaEvent e : sorted) {
+            System.out.println(counter++ + ". " + e.toString());
+        }
+
+        System.out.println("What event would you like to refund?");
+
+        int choice = scanner.nextInt();
+
+        while (choice < 1 || choice > sorted.size()) {
+            System.out.println("Please enter a valid event!");
+            choice = scanner.nextInt();
+        }
+
+        CinemaEvent selected = sorted.get(choice - 1);
+
+        System.out.println("Enter a row:");
+        int rowToRefund = scanner.nextInt();
+        System.out.println("Enter a seat:");
+        int seatToRefund = scanner.nextInt();
+
+        while (!selected.isValidSeat(rowToRefund, seatToRefund)) {
+            System.out.println("Invalid input, enter again:");
+            System.out.println("Enter a row:");
+            rowToRefund = scanner.nextInt();
+            System.out.println("Enter a seat:");
+            seatToRefund = scanner.nextInt();
+        }
+
         try {
-            Ticket refunded = selectedRoom.refund(refundRow, refundSeat);
-            System.out.println("Refunded: $" + String.format("%.2f", refunded.price().doubleValue()));
+            Ticket refunded = selected.refund(rowToRefund, seatToRefund);
+            System.out.printf("Refunded: $%.2f%n", refunded.price());
         } catch (NotBookedException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Seat " + seatToRefund + " in row " + rowToRefund + " has not been booked yet!");
+        }
+
+    }
+
+    public void showAllEvents() {
+        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
+
+        LocalDate currentDate = null;
+
+        for (CinemaEvent e : sorted) {
+            LocalDate eventDate = e.getStartTime().toLocalDate();
+
+            if (!eventDate.equals(currentDate)) {
+                currentDate = eventDate;
+                System.out.println("\n📅 " + eventDate);
+            }
+
+            System.out.println(" " + e + "\n");
         }
     }
 
+    public void showEventsByDate() {
+        System.out.println("Enter date (YYYY-MM-DD): ");
+        String dateInput = scanner.next();
+
+        try {
+            LocalDate targetDate = LocalDate.parse(dateInput);
+
+            List<CinemaEvent> filtered = megaplexx.getEvents().stream()
+                    .filter(e -> e.getStartTime().toLocalDate().equals(targetDate))
+                    .sorted(Comparator.comparing(CinemaEvent::getStartTime))
+                    .toList();
+
+            if (filtered.isEmpty()) {
+                System.out.println("No events found for this date!");
+            } else {
+                System.out.println("\n📅 " + targetDate);
+                for (CinemaEvent e : filtered) {
+                    System.out.println(" " + e);
+                }
+            }
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format! Please use YYYY-MM-DD");
+        }
+    }
 }

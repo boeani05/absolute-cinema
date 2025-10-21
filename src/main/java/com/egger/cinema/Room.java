@@ -1,32 +1,29 @@
 package com.egger.cinema;
 
-import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class Room {
-    private final String movieName;
     private final int rowsInHall;
     private final int seatsPerRow;
-    private final Map<SeatId, Ticket> bookings;
-    private final BigDecimal basePrice;
-    private final Map<Integer, BigDecimal> discountCode;
+    private final Movie movie;
+    private final ConcurrentMap<SeatId, Ticket> bookings;
+    private final Map<Integer, Double> discountCode;
+    private final String roomId;
 
-
-
-    //Constructor
-    public Room(String movieName, int rowsInHall, int seatsPerRow, BigDecimal basePrice) {
-        this.movieName = movieName;
-
+    public Room(Movie movie, int rowsInHall, int seatsPerRow, String roomId) {
+        this.movie = movie;
         this.rowsInHall = rowsInHall;
         this.seatsPerRow = seatsPerRow;
-        this.bookings = new HashMap<>();
-        this.basePrice = basePrice;
+        this.bookings = new ConcurrentHashMap<>();
         this.discountCode = new TreeMap<>();
+        this.roomId = roomId;
 
-        discountCode.put(1, BigDecimal.valueOf(0));
-        discountCode.put(2, BigDecimal.valueOf(3.99));
-        discountCode.put(3, BigDecimal.valueOf(1.99));
-        discountCode.put(4, BigDecimal.valueOf(2.99));
+        discountCode.put(1, 0.0);
+        discountCode.put(2, 3.99);
+        discountCode.put(3, 1.99);
+        discountCode.put(4, 2.99);
     }
 
     //Check if input is an existing/valid seat
@@ -36,60 +33,13 @@ public class Room {
 
     }
 
-    //check if the seat is already booked
-    public boolean isSeatAvailable(int selectedRow, int selectedSeat) {
-        return !bookings.containsKey(new SeatId(selectedRow, selectedSeat));
-    }
-
-    //TODO: what to do, if card is refunded?
-    public Ticket book(int selectedRow, int selectedSeatInRow, int discountCode) throws AlreadyBookedException {
-        //throws exception, if input seat is not valid
-        if (!isValidSeat(selectedRow, selectedSeatInRow)) {
-            throw new IllegalArgumentException("Invalid seat!");
-        }
-        //throws exception if input seat is alr. booked
-        if (!isSeatAvailable(selectedRow, selectedSeatInRow)) {
-            throw new AlreadyBookedException("Seat " + selectedSeatInRow + " in row " + selectedRow + " is already booked!");
-        }
-        //book ticket, if all tests passed
-        Ticket ticket = new Ticket(selectedRow, selectedSeatInRow, getTicketPrice(discountCode));
-        //put the seatid(key) and the ticket(value) in bookings map
-        bookings.put(new SeatId(selectedRow, selectedSeatInRow), ticket);
-        return ticket;
-    }
-
-    public Ticket refund(int selectedRow, int selectedSeat) throws NotBookedException {
-        if (!isValidSeat(selectedRow, selectedSeat)) {
-            throw new IllegalStateException("Invalid seat!");
-        }
-
-        SeatId id = new SeatId(selectedRow, selectedSeat);
-
-        Ticket refunding = bookings.get(id);
-
-        if (refunding == null) {
-            throw new NotBookedException("Seat " + selectedSeat + " in row " + selectedRow + " is not booked yet!");
-        }
-
-        bookings.remove(id);
-
-        return refunding;
-    }
 
     public List<Ticket> getTickets() {
-        return new ArrayList<>(bookings.values());
+        return Collections.unmodifiableList(new ArrayList<>(bookings.values()));
     }
 
     public String getMovieName() {
-        return movieName;
-    }
-
-    public int getRowsInHall() {
-        return rowsInHall;
-    }
-
-    public int getSeatsPerRow() {
-        return seatsPerRow;
+        return movie.title();
     }
 
     public int getAllSeatsInHall() {
@@ -104,35 +54,46 @@ public class Room {
         return (double) getSoldTickets() / getAllSeatsInHall() * 100;
     }
 
-    public BigDecimal getIncome() {
-        BigDecimal income = BigDecimal.ZERO;
+    public double getIncome() {
+        double income = 0;
         for (Ticket ticket : getTickets()) {
-            income = income.add(ticket.price());
+            income += ticket.price();
         }
         return income;
     }
 
-    public BigDecimal getPotentialIncome() {
-        return getTicketPrice(1).multiply(BigDecimal.valueOf(getAllSeatsInHall()));
+    public double getAverageIncome() {
+        if (getSoldTickets() <= 0) {
+            return 0.0;
+        }
+
+        return getIncome() / getSoldTickets();
+    }
+
+    public double getPotentialIncome() {
+        return getTicketPrice(1) * getAllSeatsInHall();
     }
 
     public Statistics getStatistics() {
-        return new Statistics(getSoldTickets(), getSoldTicketsInPercent(), getIncome(), getPotentialIncome());
+        return new Statistics(getSoldTickets(), getSoldTicketsInPercent(), getIncome(), getAverageIncome(), getPotentialIncome());
     }
 
-    public BigDecimal getTicketPrice(int code) {
-        BigDecimal price = basePrice.subtract(getDiscountValue(code));
+    public double getTicketPrice(int code) {
+        double price = movie.basePrice() - getDiscountValue(code);
 
-        if (price.signum() < 0) price = BigDecimal.ZERO;
+        if (price < 0) price = 0;
         return price;
     }
 
-    public BigDecimal getDiscountValue(int code) {
-        BigDecimal d = discountCode.get(code);
-
+    public double getDiscountValue(int code) {
+        Double d = discountCode.get(code);
         if (d == null) {
             throw new IllegalArgumentException("Invalid discount code: " + code);
         }
         return d;
+    }
+
+    public String getRoomId() {
+        return roomId;
     }
 }

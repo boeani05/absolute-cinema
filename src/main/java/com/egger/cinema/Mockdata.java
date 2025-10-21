@@ -87,6 +87,7 @@ public class Mockdata {
         return n;
     }
 
+
     private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
     private static String slugify(String s) {
         String lower = s.toLowerCase(Locale.ROOT);

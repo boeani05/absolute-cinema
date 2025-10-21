@@ -15,17 +15,32 @@ public class Cinema {
         this.events = new ArrayList<>();
 
         List<Movie> list = movies.all();
-        // safety
-        Movie m1 = list.size() > 0 ? list.get(0) : new Movie("godzilla-2014","Godzilla",123,9.99,7.9,"action");
-        Movie m2 = list.size() > 1 ? list.get(1) : new Movie("dune-2021","Dune",155,5.99,7.7,"sci-fi");
-        Movie m3 = list.size() > 2 ? list.get(2) : new Movie("interstellar-2014","Interstellar",169,7.99,9.2,"sci-fi");
-        Movie m4 = list.size() > 3 ? list.get(3) : new Movie("ring-2002","The Ring",105,4.99,7.3,"horror");
+        Movie m1 = randomlySelectMovie(list);
+        Movie m2 = randomlySelectMovie(list);
+        Movie m3 = randomlySelectMovie(list);
+        Movie m4 = randomlySelectMovie(list);
 
-        rooms.put("A", new Room(m1, 10, 7, "A"));
-        rooms.put("B", new Room(m2, 5, 5, "B"));
-        rooms.put("C", new Room(m3, 10, 10, "C"));
-        rooms.put("D", new Room(m4, 5, 10, "D"));
-        createMockEvents();
+        CinemaEvent e1 = new CinemaEvent(m1, null, LocalDateTime.now().plusHours(2));
+        CinemaEvent e2 = new CinemaEvent(m2, null, LocalDateTime.now().plusHours(3));
+        CinemaEvent e3 = new CinemaEvent(m3, null, LocalDateTime.now().plusHours(4));
+        CinemaEvent e4 = new CinemaEvent(m4, null, LocalDateTime.now().plusHours(5));
+
+        Room a = new Room(m1, 10, 7, "A", e1);
+        Room b = new Room(m2, 5, 5, "B", e2);
+        Room c = new Room(m3, 10, 10, "C", e3);
+        Room d = new Room(m4, 5, 10, "D", e4);
+
+        e1.setRoom(a);
+        e2.setRoom(b);
+        e3.setRoom(c);
+        e4.setRoom(d);
+
+        rooms.put("A", a);
+        rooms.put("B", b);
+        rooms.put("C", c);
+        rooms.put("D", d);
+
+        events.addAll(List.of(e1, e2, e3, e4));
     }
 
     public Room getRoom(String id) {
@@ -34,26 +49,19 @@ public class Cinema {
     }
 
     public int getAllSoldTickets() {
-        return events.stream()
-                .mapToInt(e -> e.getTickets().size())
-                .sum();
+        return events.stream().mapToInt(e -> e.getTickets().size()).sum();
     }
 
     public double getAllSoldTicketsInPercent() {
         int sold = getAllSoldTickets();
-        int capacityAcrossEvents = events.stream()
-                .mapToInt(e -> e.getRoom().getAllSeatsInHall())
-                .sum();
+        int capacityAcrossEvents = events.stream().mapToInt(e -> e.getRoom().getAllSeatsInHall()).sum();
         if (capacityAcrossEvents == 0) return 0.0;
         return (sold * 100.0) / capacityAcrossEvents;
     }
 
 
     public double getAllIncome() {
-        return events.stream()
-                .flatMap(e -> e.getTickets().stream())
-                .mapToDouble(Ticket::price)
-                .sum();
+        return events.stream().flatMap(e -> e.getTickets().stream()).mapToDouble(Ticket::price).sum();
     }
 
     public double getAllAverageIncome() {
@@ -64,9 +72,7 @@ public class Cinema {
 
 
     public double getAllPotentialIncome() {
-        return events.stream()
-                .mapToDouble(e -> e.getRoom().getAllSeatsInHall() * e.getRoom().getTicketPrice(1))
-                .sum();
+        return events.stream().mapToDouble(e -> e.getRoom().getAllSeatsInHall() * e.getRoom().getTicketPrice(1)).sum();
     }
 
     public String getAllStatistics() {
@@ -82,11 +88,7 @@ public class Cinema {
         }
 
         List<Room> sortedRooms = new ArrayList<>(rooms.values());
-        sortedRooms.sort(
-                Comparator.comparingDouble((Room r) -> r.getStatistics().percentSold())
-                        .reversed()
-                        .thenComparing(Room::getMovieName)
-        );
+        sortedRooms.sort(Comparator.comparingDouble((Room r) -> r.getStatistics().percentSold()).reversed().thenComparing(Room::getMovieName));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Room | Movie | Sold/Total | % Sold | Income | Potential\n");
@@ -102,15 +104,7 @@ public class Cinema {
             double income = st.income();
             double potential = st.maxIncome();
 
-            sb.append(String.format(
-                    "%s | %s | %d/%d | %.2f %%| $%.2f | $%.2f\n",
-                    roomId,
-                    room.getMovieName(),
-                    sold, total,
-                    percent,
-                    income,
-                    potential
-            ));
+            sb.append(String.format("%s | %s | %d/%d | %.2f %%| $%.2f | $%.2f\n", roomId, room.getMovieName(), sold, total, percent, income, potential));
         }
         return sb.toString();
     }
@@ -127,10 +121,9 @@ public class Cinema {
         return Collections.unmodifiableList(events);
     }
 
-    private void createMockEvents() {
-        addEvent(new CinemaEvent(movies.all().get(0), getRoom("D"), LocalDateTime.of(2025, 10, 21, 18, 15)));
-        addEvent(new CinemaEvent(movies.all().get(1), getRoom("C"), LocalDateTime.of(2025, 10, 21, 18, 45)));
-        addEvent(new CinemaEvent(movies.all().get(2), getRoom("B"), LocalDateTime.of(2025, 10, 21, 19, 15)));
-        addEvent(new CinemaEvent(movies.all().get(3), getRoom("A"), LocalDateTime.of(2025, 10, 21, 19, 45)));
+    public Movie randomlySelectMovie(List<Movie> movies) {
+        Random random = new Random();
+        int index = random.nextInt(movies.size());
+        return movies.get(index);
     }
 }

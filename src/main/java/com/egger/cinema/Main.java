@@ -22,10 +22,12 @@ public class Main {
         while (true) {
             System.out.println("""
                     1. Show all events
-                    2. Buy ticket for an event
-                    3. Refund ticket
-                    4. Show events by date
-                    5. Statistics
+                    2. Show rooms for event
+                    3. Buy ticket for an event
+                    4. Refund ticket
+                    5. Show events by date
+                    6. Statistics
+                    7. Admin Panel
                     0. Exit
                     """);
             int choice = scanner.nextInt();
@@ -36,26 +38,34 @@ public class Main {
                         showAllEvents();
                         break;
                     case 2:
-                        buyTicketForEvent();
+                        showRoomsForEvent();
                         break;
                     case 3:
-                        refundTicketForEvent();
+                        buyTicketForEvent();
                         break;
                     case 4:
-                        showEventsByDate();
+                        refundTicketForEvent();
                         break;
                     case 5:
+                        showEventsByDate();
+                        break;
+                    case 6:
                         printStatistics();
+                        break;
+                    case 7:
+                        showAdminPanel();
                         break;
                     default:
                         System.out.println("Invalid choice. Please try again.");
                 }
                 System.out.println("""
                         1. Show all events
-                        2. Buy ticket for an event
-                        3. Refund ticket
-                        4. Show events by date
-                        5. Statistics
+                        2. Show rooms for event
+                        3. Buy ticket for an event
+                        4. Refund ticket
+                        5. Show events by date
+                        6. Statistics
+                        7. Admin Panel
                         0. Exit
                         """);
                 choice = scanner.nextInt();
@@ -240,21 +250,44 @@ public class Main {
         try {
             LocalDate targetDate = LocalDate.parse(dateInput);
 
-            List<CinemaEvent> filtered = megaplexx.getEvents().stream()
-                    .filter(e -> e.getStartTime().toLocalDate().equals(targetDate))
-                    .sorted(Comparator.comparing(CinemaEvent::getStartTime))
-                    .toList();
+            List<CinemaEvent> filtered = megaplexx.getEvents().stream().filter(e -> e.getStartTime().toLocalDate().equals(targetDate)).sorted(Comparator.comparing(CinemaEvent::getStartTime)).toList();
 
             if (filtered.isEmpty()) {
                 System.out.println("No events found for this date!");
             } else {
                 System.out.println("\n📅 " + targetDate);
                 for (CinemaEvent e : filtered) {
-                    System.out.println(" " + e);
+                    System.out.println(" " + e + "\n");
                 }
             }
         } catch (DateTimeParseException e) {
             System.out.println("Invalid date format! Please use YYYY-MM-DD");
         }
+    }
+
+    public void showRoomsForEvent() {
+        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
+        int counter = 1;
+
+        for (CinemaEvent event : sorted) {
+            System.out.println(counter++ + ". " + event.toString() + "\n");
+        }
+
+        System.out.println("Which event would you like to see the rooms for?");
+        int eventToShow = scanner.nextInt();
+
+        while (eventToShow < 1 || eventToShow > sorted.size()) {
+            System.out.println("Please enter a valid event!");
+            eventToShow = scanner.nextInt();
+        }
+
+        CinemaEvent selectedEvent = sorted.get(eventToShow - 1);
+        Room room = selectedEvent.getRoom();
+        room.printSeatingChart();
+    }
+
+    public void showAdminPanel() {
+        System.out.println("Admin Panel is currently under construction.");
     }
 }

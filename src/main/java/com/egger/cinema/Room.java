@@ -1,22 +1,23 @@
 package com.egger.cinema;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class Room {
     private final int rowsInHall;
     private final int seatsPerRow;
     private final Movie movie;
-    private final ConcurrentMap<SeatId, Ticket> bookings;
+    private CinemaEvent event;
     private final Map<Integer, Double> discountCode;
     private final String roomId;
 
-    public Room(Movie movie, int rowsInHall, int seatsPerRow, String roomId) {
+    public Room(Movie movie, int rowsInHall, int seatsPerRow, String roomId, CinemaEvent event) {
         this.movie = movie;
         this.rowsInHall = rowsInHall;
         this.seatsPerRow = seatsPerRow;
-        this.bookings = new ConcurrentHashMap<>();
+        this.event = event;
+        if (this.event != null) {
+            this.event.setRoom(this);
+        }
         this.discountCode = new TreeMap<>();
         this.roomId = roomId;
 
@@ -33,11 +34,6 @@ public class Room {
 
     }
 
-
-    public List<Ticket> getTickets() {
-        return Collections.unmodifiableList(new ArrayList<>(bookings.values()));
-    }
-
     public String getMovieName() {
         return movie.title();
     }
@@ -47,7 +43,7 @@ public class Room {
     }
 
     public int getSoldTickets() {
-        return bookings.size();
+        return event.getBookings().size();
     }
 
     public double getSoldTicketsInPercent() {
@@ -56,7 +52,7 @@ public class Room {
 
     public double getIncome() {
         double income = 0;
-        for (Ticket ticket : getTickets()) {
+        for (Ticket ticket : event.getTickets()) {
             income += ticket.price();
         }
         return income;
@@ -95,5 +91,55 @@ public class Room {
 
     public String getRoomId() {
         return roomId;
+    }
+
+    public Movie getMovie() {
+        return movie;
+    }
+
+    public void setEvent(CinemaEvent event) {
+        this.event = event;
+    }
+
+    public CinemaEvent getEvent() {
+        return event;
+    }
+
+    public int getRowsInHall() {
+        return rowsInHall;
+    }
+
+    public int getSeatsPerRow() {
+        return seatsPerRow;
+    }
+
+    public Map<Integer, Double> getDiscountCode() {
+        return discountCode;
+    }
+
+    @Override
+    public String toString() {
+        return "Room " + roomId + " showing " + movie.title();
+    }
+
+    public void printSeatingChart() {
+        System.out.print("    ");
+        for (int seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
+            System.out.printf("%2d ", seatNum);
+        }
+        System.out.println();
+
+        for (int rowNum = 1; rowNum <= rowsInHall; rowNum++) {
+            System.out.printf("%2d |", rowNum);
+            for (int seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
+                SeatId seatId = new SeatId(rowNum, seatNum);
+                if (event.getBookings().containsKey(seatId)) {
+                    System.out.print(" X ");
+                } else {
+                    System.out.print(" O ");
+                }
+            }
+            System.out.println();
+        }
     }
 }

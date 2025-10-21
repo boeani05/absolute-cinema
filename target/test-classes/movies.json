@@ -1,30 +1,44 @@
 [
   {
-    "movieName": "Godzilla",
-    "durationMinutes": 123,
-    "basePrice": 9.99,
-    "rating": 7.9,
-    "genre": "action"
+    "title": "Inception",
+    "durationMinutes": 148,
+    "basePrice": 12.99,
+    "rating": 9.0,
+    "genre": "Science Fiction"
   },
   {
-    "movieName": "Dune",
-    "durationMinutes": 155,
-    "basePrice": 5.99,
-    "rating": 7.7,
-    "genre": "sci-fi"
-  },
-  {
-    "movieName": "Interstellar",
-    "durationMinutes": 169,
-    "basePrice": 7.99,
+    "title": "The Godfather",
+    "durationMinutes": 175,
+    "basePrice": 14.99,
     "rating": 9.2,
-    "genre": "sci-fi"
+    "genre": "Crime"
   },
   {
-    "movieName": "The Ring",
-    "durationMinutes": 105,
-    "basePrice": 4.99,
-    "rating": 7.3,
-    "genre": "horror"
+    "title": "Pulp Fiction",
+    "durationMinutes": 154,
+    "basePrice": 13.99,
+    "rating": 8.9,
+    "genre": "Crime"
+  },
+  {
+    "title": "The Dark Knight",
+    "durationMinutes": 152,
+    "basePrice": 15.99,
+    "rating": 9.0,
+    "genre": "Action"
+  },
+  {
+    "title": "Forrest Gump",
+    "durationMinutes": 142,
+    "basePrice": 11.99,
+    "rating": 8.8,
+    "genre": "Drama"
+  },
+  {
+    "title": "The Matrix",
+    "durationMinutes": 136,
+    "basePrice": 13.49,
+    "rating": 8.7,
+    "genre": "Science Fiction"
   }
 ]

@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class CinemaEvent {
     private final Movie movie;
-    private final Room room;
+    private Room room;
     private final LocalDateTime startTime;
     private final ConcurrentMap<SeatId, Ticket> bookings;
 
@@ -46,6 +46,8 @@ public class CinemaEvent {
         if (!(o instanceof CinemaEvent)) return false;
 
         CinemaEvent that = (CinemaEvent) o;
+        String thisRoomId = that.room != null ? that.room.getRoomId() : null;
+        String thatRoomId = that.room != null ? that.room.getRoomId() : null;
         return Objects.equals(movie.id(), that.movie.id()) &&
                 Objects.equals(room.getRoomId(), that.room.getRoomId()) &&
                 Objects.equals(startTime, that.startTime);
@@ -53,6 +55,8 @@ public class CinemaEvent {
 
     @Override
     public int hashCode() {
+        String roomId = room != null ? room.getRoomId() : null;
+        assert room != null;
         return Objects.hash(movie.id(), room.getRoomId(), startTime);
     }
 
@@ -93,5 +97,13 @@ public class CinemaEvent {
 
     public Collection<Ticket> getTickets() {
         return Collections.unmodifiableList(new ArrayList<>(bookings.values()));
+    }
+
+    public ConcurrentMap<SeatId, Ticket> getBookings() {
+        return bookings;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
     }
 }

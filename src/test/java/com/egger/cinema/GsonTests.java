@@ -1,5 +1,6 @@
 package com.egger.cinema;
 
+import org.assertj.core.groups.Tuple;
 import org.junit.Test;
 import java.io.InputStream;
 import java.util.List;
@@ -29,10 +30,12 @@ public class GsonTests {
                             Movie::genre
                     )
                     .containsExactly(
-                            tuple("Godzilla", 123, 9.99, 7.9, "action"),
-                            tuple("Dune", 155, 5.99, 7.7, "sci-fi"),
-                            tuple("Interstellar", 169, 7.99, 9.2, "sci-fi"),
-                            tuple("The Ring", 105, 4.99, 7.3, "horror")
+                            tuple("Inception", 148, 12.99, 9.0, "Science Fiction"),
+                            tuple("The Godfather", 175, 14.99, 9.2, "Crime"),
+                            tuple("Pulp Fiction", 154, 13.99, 8.9, "Crime"),
+                            tuple("The Dark Knight", 152, 15.99, 9.0, "Action"),
+                            tuple("Forrest Gump", 142, 11.99, 8.8, "Drama"),
+                            tuple("The Matrix", 136, 13.49, 8.7, "Science Fiction")
                     );
 
             for (Movie movie : movies) {
@@ -54,6 +57,56 @@ public class GsonTests {
             assertThatThrownBy(() -> Mockdata.loadMovies(is))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("durationMinutes");
+        }
+    }
+
+    @Test
+    public void deserializeMovies_invalidData_outOfRange() throws Exception {
+        String json = """
+                [ { "title": "Weird Movie", "durationMinutes": 100, "basePrice": 5.0, "rating": 15.0, "genre": "drama" } ]
+                """;
+
+        try (InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
+            assertThatThrownBy(() -> Mockdata.loadMovies(is))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("rating");
+        }
+    }
+
+    @Test
+    public void deserializeMovies_invalidData_negativeValues() throws Exception {
+        String json = """
+                [ { "title": "Negative Price Movie", "durationMinutes": 100, "basePrice": -5.0, "rating": 5.0, "genre": "comedy" } ]
+                """;
+
+        try (InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
+            assertThatThrownBy(() -> Mockdata.loadMovies(is))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("basePrice");
+        }
+    }
+
+    @Test
+    public void deserializeMovies_invalidData_blankTitle() throws Exception {
+        String json = """
+                [ { "title": "   ", "durationMinutes": 100, "basePrice": 5.0, "rating": 5.0, "genre": "comedy" } ]
+                """;
+
+        try (InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
+            assertThatThrownBy(() -> Mockdata.loadMovies(is))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("title/movieName");
+        }
+    }
+
+    @Test
+    public void deserializeMovies_emptyList() throws Exception {
+        String json = "[]";
+
+        try (InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))) {
+            List<Movie> movies = Mockdata.loadMovies(is);
+            assertThat(movies).isNotNull();
+            assertThat(movies).isEmpty();
         }
     }
 

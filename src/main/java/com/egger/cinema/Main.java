@@ -18,6 +18,10 @@ public class Main {
         scanner = new Scanner(System.in);
         megaplexx = new Cinema();
 
+        megaplexx.addSnack("Popcorn", 5.00);
+        megaplexx.addSnack("Soda", 3.00);
+        megaplexx.addSnack("Candy", 4.00);
+
         System.out.println("Welcome to Megaplexx!");
 
         System.out.println("""
@@ -25,10 +29,12 @@ public class Main {
                 1. Show all events
                 2. Show rooms for event
                 3. Buy ticket for an event
-                4. Refund ticket
-                5. Show events by date
-                6. Statistics
-                7. Admin Panel
+                4. Buy snacks
+                5. Refund ticket
+                6. Show events by date
+                7. Statistics
+                8. Admin Panel
+                9. Show your tickets
                 0. Exit
                 """);
         int choice = scanner.nextInt();
@@ -45,16 +51,22 @@ public class Main {
                     buyTicketForEvent();
                     break;
                 case 4:
-                    refundTicketForEvent();
+                    buySnacks();
                     break;
                 case 5:
-                    showEventsByDate();
+                    refundTicketForEvent();
                     break;
                 case 6:
-                    printStatistics();
+                    showEventsByDate();
                     break;
                 case 7:
+                    printStatistics();
+                    break;
+                case 8:
                     showAdminPanel();
+                    break;
+                case 9:
+                    showAllTicketsPerEvent();
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -64,10 +76,12 @@ public class Main {
                     1. Show all events
                     2. Show rooms for event
                     3. Buy ticket for an event
-                    4. Refund ticket
-                    5. Show events by date
-                    6. Statistics
-                    7. Admin Panel
+                    4. Buy snacks
+                    5. Refund ticket
+                    6. Show events by date
+                    7. Statistics
+                    8. Admin Panel
+                    9. Show your tickets
                     0. Exit
                     """);
             choice = scanner.nextInt();
@@ -188,8 +202,9 @@ public class Main {
         }
 
         int counter = 1;
+        System.out.println("\n📅" + LocalDate.now() + "\n");
         for (CinemaEvent e : sorted) {
-            System.out.println(counter++ + ". " + e.toString());
+            System.out.println(counter++ + ". " + e.toString() + "\n");
         }
 
         System.out.println("What event would you like to refund?");
@@ -203,7 +218,10 @@ public class Main {
 
         CinemaEvent selected = sorted.get(choice - 1);
 
-        System.out.println("Enter a row:");
+        Room room = selected.getRoom();
+        room.printSeatingChart();
+
+        System.out.println("\nEnter a row:");
         int rowToRefund = scanner.nextInt();
         System.out.println("Enter a seat:");
         int seatToRefund = scanner.nextInt();
@@ -322,5 +340,27 @@ public class Main {
             return;
         }
         megaplexx.printAdminView();
+    }
+
+    public void buySnacks() {
+        int snackChoice;
+
+        System.out.println("What snack would you like to buy?");
+        megaplexx.printSnackMenu();
+        snackChoice = scanner.nextInt();
+
+        while (snackChoice < 1 || snackChoice > megaplexx.getSnacks().size()) {
+            System.out.println("Invalid choice, enter again:");
+            snackChoice = scanner.nextInt();
+        }
+        megaplexx.buySnack((String) megaplexx.getSnacks().keySet().toArray()[snackChoice - 1]);
+    }
+
+    public void showAllTicketsPerEvent() {
+        for (CinemaEvent event : megaplexx.getEvents()) {
+            int soldTicketsCounter = event.getSoldTickets();
+            System.out.println("Tickets for event " + event.getRoom().getRoomId() + ": " + soldTicketsCounter + " sold tickets.");
+            System.out.println();
+        }
     }
 }

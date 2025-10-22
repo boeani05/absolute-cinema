@@ -1,6 +1,5 @@
 package com.egger.cinema;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -9,8 +8,13 @@ public class Cinema {
     private final Map<String, Room> rooms;
     private final Movies movies;
     private final List<CinemaEvent> events;
+    private final Map<String , Double> snacks;
+    private final Map<String, Double> boughtSnacks;
 
     public Cinema() {
+
+        snacks = new HashMap<>();
+        boughtSnacks = new HashMap<>();
         this.movies = Movies.fromJsonResource("/movies.json");
         this.rooms = new TreeMap<>();
         this.events = new ArrayList<>();
@@ -63,13 +67,17 @@ public class Cinema {
 
 
     public double getAllIncome() {
-        return events.stream().flatMap(e -> e.getTickets().stream()).mapToDouble(Ticket::price).sum();
+        return events.stream().flatMap(e -> e.getTickets().stream()).mapToDouble(Ticket::price).sum() + getAllSnackPrice();
     }
 
     public double getAllAverageIncome() {
         int sold = getAllSoldTickets();
         if (sold == 0) return 0.0;
         return getAllIncome() / sold;
+    }
+
+    public double getAllSnackPrice() {
+        return boughtSnacks.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 
 
@@ -156,5 +164,31 @@ public class Cinema {
             }
         }
         return upcomingEvents;
+    }
+
+    public void addSnack(String name, double price) {
+        snacks.put(name, price);
+    }
+
+    public Map<Object, Object> getSnacks() {
+        return Map.copyOf(snacks);
+    }
+
+    public void printSnackMenu() {
+        int counter = 1;
+        System.out.println("\nSnack Menu:");
+        for (Map.Entry<String, Double> entry : snacks.entrySet()) {
+            System.out.printf(counter++ + ". %s: $%.2f%n", entry.getKey(), entry.getValue());
+        }
+    }
+
+    public void buySnack(String name) {
+        Double price = snacks.get(name);
+        if (price != null) {
+            boughtSnacks.put(name, price);
+            System.out.printf("Bought snack: %s for $%.2f%n", name, price);
+        } else {
+            System.out.println("Snack not found: " + name);
+        }
     }
 }

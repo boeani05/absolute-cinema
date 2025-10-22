@@ -8,7 +8,7 @@ public record Statistics(int soldTicketAmount, double percentSold, double income
                 Percentage: %.2f%%
                 Current income: $%.2f
                 Average income per sold ticket: $%.2f
-                Total potential income: $%.2f
+                Total potential income for rooms: $%.2f
                 
                 """,
                 soldTicketAmount,

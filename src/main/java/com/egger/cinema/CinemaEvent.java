@@ -1,5 +1,6 @@
 package com.egger.cinema;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -100,5 +101,13 @@ public class CinemaEvent {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public LocalDateTime getEventDateTime() {
+        return startTime;
+    }
+
+    public Instant getDateTime() {
+        return startTime.atZone(java.time.ZoneId.systemDefault()).toInstant();
     }
 }

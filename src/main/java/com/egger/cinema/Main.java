@@ -1,6 +1,7 @@
 package com.egger.cinema;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
@@ -244,24 +245,46 @@ public class Main {
     }
 
     public void showEventsByDate() {
-        System.out.println("Enter date (YYYY-MM-DD): ");
+        System.out.println("Enter date (YYYY-MM-DD):");
         String dateInput = scanner.next();
 
+        LocalDate date;
         try {
-            LocalDate targetDate = LocalDate.parse(dateInput);
-
-            List<CinemaEvent> filtered = megaplexx.getEvents().stream().filter(e -> e.getStartTime().toLocalDate().equals(targetDate)).sorted(Comparator.comparing(CinemaEvent::getStartTime)).toList();
-
-            if (filtered.isEmpty()) {
-                System.out.println("No events found for this date!");
-            } else {
-                System.out.println("\n📅 " + targetDate);
-                for (CinemaEvent e : filtered) {
-                    System.out.println(" " + e + "\n");
-                }
-            }
+            date = LocalDate.parse(dateInput);
         } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format! Please use YYYY-MM-DD");
+            System.out.println("Invalid date format!");
+            return;
+        }
+
+        List<CinemaEvent> eventsOnDate = new ArrayList<>();
+        for (CinemaEvent event : megaplexx.getEvents()) {
+            if (event.getStartTime().toLocalDate().equals(date)) {
+                eventsOnDate.add(event);
+            }
+        }
+
+        //TODO: add events of the entered date
+
+        for (CinemaEvent event : megaplexx.getUpcomingEvents(LocalDateTime.now(), LocalDateTime.now().plusDays(7))) {
+            if (event.getStartTime().toLocalDate().equals(date)) {
+                eventsOnDate.add(event);
+            }
+        }
+
+
+
+        if (eventsOnDate.isEmpty()) {
+            System.out.println("No events found on " + date);
+            return;
+        }
+
+        eventsOnDate.sort(Comparator.comparing(CinemaEvent::getStartTime));
+        int counter = 1;
+
+        System.out.println("\n📅 " + date + "\n");
+
+        for (CinemaEvent event : eventsOnDate) {
+            System.out.println(counter++ + ". " + event + "\n");
         }
     }
 

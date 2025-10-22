@@ -1,5 +1,6 @@
 package com.egger.cinema;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -142,5 +143,18 @@ public class Cinema {
         final String ADMIN_PASSWORD = "password123";
 
         return ADMIN_USERNAME.equals(username) && ADMIN_PASSWORD.equals(password);
+    }
+
+    //get events of the next dates
+
+    public List<CinemaEvent> getUpcomingEvents(LocalDateTime from, LocalDateTime to) {
+        List<CinemaEvent> upcomingEvents = new ArrayList<>();
+        for (CinemaEvent event : events) {
+            LocalDateTime eventTime = event.getStartTime();
+            if ((eventTime.equals(from) || eventTime.isAfter(from)) && (eventTime.equals(to) || eventTime.isBefore(to))) {
+                upcomingEvents.add(event);
+            }
+        }
+        return upcomingEvents;
     }
 }

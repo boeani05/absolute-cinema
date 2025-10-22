@@ -1,6 +1,8 @@
 package com.egger.cinema;
 
 import org.junit.Test;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.io.ByteArrayInputStream;
@@ -116,4 +118,21 @@ public class GsonTests {
         }
     }
 
+    @Test
+    public void deserializeMovies_nullInputStream() {
+        assertThatThrownBy(() -> Mockdata.loadMovies(null))
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("InputStream is null");
+    }
+
+    @Test
+    public void deserializeMovies_missingResource() {
+        assertThatThrownBy(() -> {
+            try (InputStream is = GsonTests.class.getResourceAsStream("/nonexistent.json")) {
+                Mockdata.loadMovies(is);
+            }
+        })
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("InputStream is null");
+    }
 }

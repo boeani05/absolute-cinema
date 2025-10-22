@@ -337,7 +337,16 @@ public class Main {
         }
 
         System.out.println("Which event would you like to see the rooms for?");
-        int eventToShow = scanner.nextInt();
+
+        String eventToShowStr;
+
+        while (!scanner.hasNextInt()) {
+            System.out.println("Please enter a valid number");
+            scanner.next();
+        }
+        eventToShowStr = scanner.next();
+        int eventToShow = Integer.parseInt(eventToShowStr);
+
 
         while (eventToShow < 1 || eventToShow > sorted.size()) {
             System.out.println("Please enter a valid event!");

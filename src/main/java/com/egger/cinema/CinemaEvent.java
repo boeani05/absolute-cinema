@@ -3,9 +3,7 @@ package com.egger.cinema;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -105,10 +103,12 @@ public class CinemaEvent {
         this.room = room;
     }
 
+    @SuppressWarnings("unused")
     public LocalDateTime getEventDateTime() {
         return startTime;
     }
 
+    @SuppressWarnings("unused")
     public Instant getDateTime() {
         return startTime.atZone(java.time.ZoneId.systemDefault()).toInstant();
     }

@@ -37,7 +37,16 @@ public class Main {
                 9. Show your tickets
                 0. Exit
                 """);
-        int choice = scanner.nextInt();
+
+        String choiceStr;
+
+        while (!scanner.hasNextInt()) {
+            System.out.println("Please enter a valid number");
+            scanner.next();
+        }
+        choiceStr = scanner.next();
+        int choice = Integer.parseInt(choiceStr);
+
 
         while (choice != 0) {
             switch (choice) {
@@ -84,7 +93,13 @@ public class Main {
                     9. Show your tickets
                     0. Exit
                     """);
-            choice = scanner.nextInt();
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("Please enter a valid number");
+                scanner.next();
+            }
+            choiceStr = scanner.next();
+            choice = Integer.parseInt(choiceStr);
         }
         System.out.println("Thank you for visiting Megaplexx! Goodbye!");
     }
@@ -129,67 +144,72 @@ public class Main {
         }
 
         System.out.println("Which event would you like to book a seat for?");
-        eventToBuy = scanner.nextInt();
-
-        while (eventToBuy < 1 || eventToBuy > sorted.size()) {
-            System.out.println("Please enter a valid event!");
+        try {
             eventToBuy = scanner.nextInt();
-        }
 
-        CinemaEvent selectedEvent = sorted.get(eventToBuy - 1);
+            while (eventToBuy < 1 || eventToBuy > sorted.size()) {
+                System.out.println("Please enter a valid event!");
+                eventToBuy = scanner.nextInt();
+            }
 
-        Room room = selectedEvent.getRoom();
+            CinemaEvent selectedEvent = sorted.get(eventToBuy - 1);
+
+            Room room = selectedEvent.getRoom();
 
 
-        System.out.println("How many tickets do you want to buy?");
-        amountToBuy = scanner.nextInt();
-
-        while (amountToBuy > room.getAllSeatsInHall()) {
-            System.out.println("This cinema hall doesn't support this much seats!\n\nEnter again: ");
+            System.out.println("How many tickets do you want to buy?");
             amountToBuy = scanner.nextInt();
-        }
 
-        for (int ticketNr = 1; ticketNr <= amountToBuy; ticketNr++) {
-            System.out.println("What kind of ticket(s) do you want to buy?\n1. Regular\n2. Child\n3. Senior\n4. Student\n0. Cancel");
-            discountCode = scanner.nextInt();
-
-            if (discountCode == 0) {
-                System.out.println("Transaction cancelled.");
-                return;
+            while (amountToBuy > room.getAllSeatsInHall()) {
+                System.out.println("This cinema hall doesn't support this much seats!\n\nEnter again: ");
+                amountToBuy = scanner.nextInt();
             }
 
-            while (discountCode < 1 || discountCode > 4) {
-                System.out.println("Invalid input, enter again: ");
+            for (int ticketNr = 1; ticketNr <= amountToBuy; ticketNr++) {
+                System.out.println("What kind of ticket(s) do you want to buy?\n1. Regular\n2. Child\n3. Senior\n4. Student\n0. Cancel");
                 discountCode = scanner.nextInt();
-            }
 
-            while (true) {
-                System.out.println("\nEnter a row number (1 - " + room.getRowsInHall() + "):");
-                rowNumberToBuy = scanner.nextInt();
-                System.out.println("Enter a seat number in that row (1 - " + room.getSeatsPerRow() + "):");
-                seatNumberToBuy = scanner.nextInt();
-
-                if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
-                    System.out.println("\nWrong input!");
-                    continue;
+                if (discountCode == 0) {
+                    System.out.println("Transaction cancelled.");
+                    return;
                 }
 
-                if (!selectedEvent.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
-                    System.out.println("\nThat ticket has already been purchased!");
-                    continue;
+                while (discountCode < 1 || discountCode > 4) {
+                    System.out.println("Invalid input, enter again: ");
+                    discountCode = scanner.nextInt();
                 }
 
-                break;
-            }
+                while (true) {
+                    System.out.println("\nEnter a row number (1 - " + room.getRowsInHall() + "):");
+                    rowNumberToBuy = scanner.nextInt();
+                    System.out.println("Enter a seat number in that row (1 - " + room.getSeatsPerRow() + "):");
+                    seatNumberToBuy = scanner.nextInt();
+
+                    if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
+                        System.out.println("\nWrong input!");
+                        continue;
+                    }
+
+                    if (!selectedEvent.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
+                        System.out.println("\nThat ticket has already been purchased!");
+                        continue;
+                    }
+
+                    break;
+                }
 
 
-            try {
-                Ticket boughtTicket = selectedEvent.book(rowNumberToBuy, seatNumberToBuy, discountCode);
-                System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
-            } catch (AlreadyBookedException e) {
-                System.out.println(e.getMessage());
+                try {
+                    Ticket boughtTicket = selectedEvent.book(rowNumberToBuy, seatNumberToBuy, discountCode);
+                    System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
+                } catch (AlreadyBookedException e) {
+                    System.out.println(e.getMessage());
+                }
             }
+        } catch (InputMismatchException e) {
+            System.out.println("Please enter something valid!");
         }
+
     }
 
     public void refundTicketForEvent() {
@@ -288,7 +308,6 @@ public class Main {
                 eventsOnDate.add(event);
             }
         }
-
 
 
         if (eventsOnDate.isEmpty()) {

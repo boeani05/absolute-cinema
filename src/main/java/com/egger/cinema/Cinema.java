@@ -8,16 +8,17 @@ public class Cinema {
     private final Map<String, Room> rooms;
     private final Movies movies;
     private final List<CinemaEvent> events;
-    private final Map<String , Double> snacks;
+    private final Map<String, Double> snacks;
     private final Map<String, Double> boughtSnacks;
+    private final Map<Integer, Double> discount;
 
     public Cinema() {
-
-        snacks = new HashMap<>();
-        boughtSnacks = new HashMap<>();
+        this.snacks = new LinkedHashMap<>();
         this.movies = Movies.fromJsonResource("/movies.json");
         this.rooms = new TreeMap<>();
         this.events = new ArrayList<>();
+        this.discount = new HashMap<>();
+        this.boughtSnacks = new LinkedHashMap<>();
 
         List<Movie> list = movies.all();
         Movie m1 = randomlySelectMovie(list);
@@ -46,12 +47,50 @@ public class Cinema {
         rooms.put("D", d);
 
         events.addAll(List.of(e1, e2, e3, e4));
+
+        DiscountCode d1 = new DiscountCode(1, 0.0);
+        DiscountCode d2 = new DiscountCode(2, 2.99);
+        DiscountCode d3 = new DiscountCode(3, 1.99);
+        DiscountCode d4 = new DiscountCode(4, 1.49);
+
+        discount.putAll(Map.of(d1.code(), d1.discount(), d2.code(), d2.discount(), d3.code(), d3.discount(), d4.code(), d4.discount()));
     }
 
     @SuppressWarnings("unused")
     public Room getRoom(String id) {
         if (id == null) return null;
         return rooms.get(id.toUpperCase(Locale.ROOT));
+    }
+
+    public Ticket book(CinemaEvent event, int row, int seat, int discountCode) throws AlreadyBookedException {
+        if (!event.isValidSeat(row, seat)) {
+            throw new IllegalArgumentException("Invalid seat!");
+        }
+
+        double discountValue = getDiscountValue(discountCode);
+
+        return event.book(row, seat, discountValue);
+    }
+
+
+    public Ticket refund(CinemaEvent selected, int row, int seat) throws NotBookedException {
+        if (!selected.isValidSeat(row, seat)) {
+            throw new IllegalStateException("Invalid seat!");
+        }
+        SeatId id = new SeatId(row, seat);
+        Ticket removed = selected.getBookings().remove(id);
+        if (removed == null) {
+            throw new NotBookedException("Seat " + seat + " in row " + row + " is not booked yet!");
+        }
+        return removed;
+    }
+
+    private double getDiscountValue(int code) {
+        Double d = discount.get(code);
+        if (d == null) {
+            throw new IllegalArgumentException("Invalid discount code: " + code);
+        }
+        return d;
     }
 
     public int getAllSoldTickets() {
@@ -141,8 +180,7 @@ public class Cinema {
     public void printAdminView() {
         System.out.println("Available Movies:");
         for (Movie movie : movies.getAll()) {
-            System.out.printf("Title: %s, Genre: %s, Duration: %d minutes, Rating: %.1f, Base Price: $%.2f%n%n",
-                    movie.title(), movie.genre(), movie.durationMinutes(), movie.rating(), movie.basePrice());
+            System.out.printf("Title: %s, Genre: %s, Duration: %d minutes, Rating: %.1f, Base Price: $%.2f%n%n", movie.title(), movie.genre(), movie.durationMinutes(), movie.rating(), movie.basePrice());
         }
     }
 
@@ -171,14 +209,13 @@ public class Cinema {
     }
 
     public Map<Object, Object> getSnacks() {
-        return Map.copyOf(snacks);
+        return Collections.unmodifiableMap(snacks);
     }
 
     public void printSnackMenu() {
         int counter = 1;
-        System.out.println("\nSnack Menu:");
         for (Map.Entry<String, Double> entry : snacks.entrySet()) {
-            System.out.printf(counter++ + ". %s: $%.2f%n", entry.getKey(), entry.getValue());
+            System.out.printf("%d. %s: $%.2f%n", counter++, entry.getKey(), entry.getValue());
         }
     }
 

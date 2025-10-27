@@ -1,6 +1,5 @@
 package com.egger.cinema;
 
-import java.time.ZoneId;
 import java.util.*;
 
 public class Room {
@@ -8,7 +7,6 @@ public class Room {
     private final int seatsPerRow;
     private final Movie movie;
     private CinemaEvent event;
-    private final Map<Integer, Double> discountCode;
     private final String roomId;
 
     public Room(Movie movie, int rowsInHall, int seatsPerRow, String roomId, CinemaEvent event) {
@@ -19,13 +17,10 @@ public class Room {
         if (this.event != null) {
             this.event.setRoom(this);
         }
-        this.discountCode = new TreeMap<>();
+
         this.roomId = roomId;
 
-        discountCode.put(1, 0.0);
-        discountCode.put(2, 3.99);
-        discountCode.put(3, 1.99);
-        discountCode.put(4, 2.99);
+
     }
 
     //Check if input is an existing/valid seat
@@ -75,19 +70,11 @@ public class Room {
         return new Statistics(getSoldTickets(), getSoldTicketsInPercent(), getIncome(), getAverageIncome(), getPotentialIncome());
     }
 
-    public double getTicketPrice(int code) {
-        double price = movie.basePrice() - getDiscountValue(code);
+    public double getTicketPrice(double discountValue) {
+        double price = movie.basePrice() - discountValue;
 
         if (price < 0) price = 0;
         return price;
-    }
-
-    public double getDiscountValue(int code) {
-        Double d = discountCode.get(code);
-        if (d == null) {
-            throw new IllegalArgumentException("Invalid discount code: " + code);
-        }
-        return d;
     }
 
     public String getRoomId() {
@@ -115,11 +102,6 @@ public class Room {
 
     public int getSeatsPerRow() {
         return seatsPerRow;
-    }
-
-    @SuppressWarnings("unused")
-    public Map<Integer, Double> getDiscountCode() {
-        return discountCode;
     }
 
     @Override

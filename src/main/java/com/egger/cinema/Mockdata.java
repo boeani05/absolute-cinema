@@ -34,7 +34,8 @@ public class Mockdata {
         }
 
         try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            Type listType = new TypeToken<List<MovieJson>>() {}.getType();
+            Type listType = new TypeToken<List<MovieJson>>() {
+            }.getType();
             List<MovieJson> raw = GSON.fromJson(reader, listType);
             if (raw == null || raw.isEmpty()) return List.of();
 
@@ -45,10 +46,10 @@ public class Mockdata {
                     throw new IllegalArgumentException("Movie entry missing title/movieName");
                 }
                 String id = isBlank(r.id) ? slugify(title) : r.id;
-                int duration = requirePositive(r.durationMinutes, "durationMinutes");
-                double basePrice = requireNonNegative(r.basePrice, "basePrice");
-                double rating = requireInRange(r.rating, 0.0, 10.0, "rating");
-                String genre = requireNonBlank(r.genre, "genre");
+                int duration = requirePositive(r.durationMinutes);
+                double basePrice = requireNonNegative(r.basePrice);
+                double rating = requireInRange(r.rating);
+                String genre = requireNonBlank(r.genre);
 
                 result.add(new Movie(
                         id,
@@ -66,29 +67,35 @@ public class Mockdata {
     private static String firstNonBlank(String a, String b) {
         return !isBlank(a) ? a : (!isBlank(b) ? b : null);
     }
+
     private static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }
-    private static String requireNonBlank(String s, String field) {
-        if (isBlank(s)) throw new IllegalArgumentException("Missing or blank field: " + field);
+
+    private static String requireNonBlank(String s) {
+        if (isBlank(s)) throw new IllegalArgumentException("Missing or blank field: " + "genre");
         return s;
     }
-    private static int requirePositive(Integer n, String field) {
-        if (n == null || n <= 0) throw new IllegalArgumentException(field + " must be > 0");
+
+    private static int requirePositive(Integer n) {
+        if (n == null || n <= 0) throw new IllegalArgumentException("durationMinutes" + " must be > 0");
         return n;
     }
-    private static double requireNonNegative(Double n, String field) {
-        if (n == null || n < 0) throw new IllegalArgumentException(field + " must be >= 0");
+
+    private static double requireNonNegative(Double n) {
+        if (n == null || n < 0) throw new IllegalArgumentException("basePrice" + " must be >= 0");
         return n;
     }
-    private static double requireInRange(Double n, double min, double max, String field) {
-        if (n == null || n < min || n > max)
-            throw new IllegalArgumentException(field + " must be between " + min + " and " + max);
+
+    private static double requireInRange(Double n) {
+        if (n == null || n < 0.0 || n > 10.0)
+            throw new IllegalArgumentException("rating" + " must be between " + 0.0 + " and " + 10.0);
         return n;
     }
 
 
     private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
+
     private static String slugify(String s) {
         String lower = s.toLowerCase(Locale.ROOT);
         String slug = NON_ALNUM.matcher(lower).replaceAll("-");

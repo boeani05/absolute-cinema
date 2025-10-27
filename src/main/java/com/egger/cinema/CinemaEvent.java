@@ -4,21 +4,21 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class CinemaEvent {
     private final Movie movie;
     private Room room;
     private final LocalDateTime startTime;
-    private final ConcurrentMap<SeatId, Ticket> bookings;
+    private final Map<SeatId, Ticket> bookings;
 
     public CinemaEvent(Movie movie, Room room, LocalDateTime startTime) {
         this.movie = movie;
         this.room = room;
         this.startTime = startTime;
-        this.bookings = new ConcurrentHashMap<>();
+        this.bookings = new HashMap<>();
     }
 
     @SuppressWarnings("unused")
@@ -64,13 +64,13 @@ public class CinemaEvent {
         return !bookings.containsKey(new SeatId(row, seat));
     }
 
-    public Ticket book(int row, int seat, int discountCode) throws AlreadyBookedException {
+    Ticket book(int row, int seat, double discountValue) throws AlreadyBookedException {
         if (!isValidSeat(row, seat)) {
             throw new IllegalArgumentException("Invalid seat!");
         }
 
         SeatId id = new SeatId(row, seat);
-        Ticket newTicket = new Ticket(row, seat, room.getTicketPrice(discountCode));
+        Ticket newTicket = new Ticket(row, seat, room.getTicketPrice(discountValue));
 
         Ticket existing = bookings.putIfAbsent(id, newTicket);
         if (existing != null) {
@@ -79,23 +79,11 @@ public class CinemaEvent {
         return newTicket;
     }
 
-    public Ticket refund(int row, int seat) throws NotBookedException {
-        if (!isValidSeat(row, seat)) {
-            throw new IllegalStateException("Invalid seat!");
-        }
-        SeatId id = new SeatId(row, seat);
-        Ticket removed = bookings.remove(id);
-        if (removed == null) {
-            throw new NotBookedException("Seat " + seat + " in row " + row + " is not booked yet!");
-        }
-        return removed;
-    }
-
     public Collection<Ticket> getTickets() {
         return java.util.List.copyOf(bookings.values());
     }
 
-    public ConcurrentMap<SeatId, Ticket> getBookings() {
+    Map<SeatId, Ticket> getBookings() {
         return bookings;
     }
 

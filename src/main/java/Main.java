@@ -1,4 +1,4 @@
-package com.egger.cinema;
+import com.egger.cinema.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,9 +18,10 @@ public class Main {
         scanner = new Scanner(System.in);
         megaplexx = new Cinema();
 
-        megaplexx.addSnack("Popcorn", 5.00);
-        megaplexx.addSnack("Soda", 3.00);
-        megaplexx.addSnack("Candy", 4.00);
+        megaplexx.addSnack("Popcorn", 5.99);
+        megaplexx.addSnack("Soda", 1.99);
+        megaplexx.addSnack("Nachos", 3.99);
+
 
         System.out.println("Welcome to Megaplexx!");
 
@@ -38,14 +39,16 @@ public class Main {
                 0. Exit
                 """);
 
-        String choiceStr;
-
-        while (!scanner.hasNextInt()) {
-            System.out.println("Please enter a valid number");
-            scanner.next();
+        int choice;
+        while (true) {
+            try {
+                choice = scanner.nextInt();
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number!");
+                scanner.next();
+            }
         }
-        choiceStr = scanner.next();
-        int choice = Integer.parseInt(choiceStr);
 
 
         while (choice != 0) {
@@ -94,12 +97,15 @@ public class Main {
                     0. Exit
                     """);
 
-            while (!scanner.hasNextInt()) {
-                System.out.println("Please enter a valid number");
-                scanner.next();
+            while (true) {
+                try {
+                    choice = scanner.nextInt();
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Please enter a valid number!");
+                    scanner.next();
+                }
             }
-            choiceStr = scanner.next();
-            choice = Integer.parseInt(choiceStr);
         }
         System.out.println("Thank you for visiting Megaplexx! Goodbye!");
     }
@@ -107,7 +113,17 @@ public class Main {
     private void printStatistics() {
 
         System.out.println("1. Show statistics of whole cinema\n2. Show statistics in a per-room table");
-        int choiceStatistics = scanner.nextInt();
+        int choiceStatistics;
+
+        while (true) {
+            try {
+                choiceStatistics = scanner.nextInt();
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number:");
+                scanner.next();
+            }
+        }
 
         switch (choiceStatistics) {
             case 1:
@@ -144,72 +160,90 @@ public class Main {
         }
 
         System.out.println("Which event would you like to book a seat for?");
-        try {
-            eventToBuy = scanner.nextInt();
 
-            while (eventToBuy < 1 || eventToBuy > sorted.size()) {
-                System.out.println("Please enter a valid event!");
+        CinemaEvent selectedEvent;
+
+        while (true) {
+            try {
                 eventToBuy = scanner.nextInt();
+                selectedEvent = sorted.get(eventToBuy - 1);
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number!");
+                scanner.next();
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Please enter a number from 1 - 4!");
             }
-
-            CinemaEvent selectedEvent = sorted.get(eventToBuy - 1);
-
-            Room room = selectedEvent.getRoom();
-
-
-            System.out.println("How many tickets do you want to buy?");
-            amountToBuy = scanner.nextInt();
-
-            while (amountToBuy > room.getAllSeatsInHall()) {
-                System.out.println("This cinema hall doesn't support this much seats!\n\nEnter again: ");
-                amountToBuy = scanner.nextInt();
-            }
-
-            for (int ticketNr = 1; ticketNr <= amountToBuy; ticketNr++) {
-                System.out.println("What kind of ticket(s) do you want to buy?\n1. Regular\n2. Child\n3. Senior\n4. Student\n0. Cancel");
-                discountCode = scanner.nextInt();
-
-                if (discountCode == 0) {
-                    System.out.println("Transaction cancelled.");
-                    return;
-                }
-
-                while (discountCode < 1 || discountCode > 4) {
-                    System.out.println("Invalid input, enter again: ");
-                    discountCode = scanner.nextInt();
-                }
-
-                while (true) {
-                    System.out.println("\nEnter a row number (1 - " + room.getRowsInHall() + "):");
-                    rowNumberToBuy = scanner.nextInt();
-                    System.out.println("Enter a seat number in that row (1 - " + room.getSeatsPerRow() + "):");
-                    seatNumberToBuy = scanner.nextInt();
-
-                    if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
-                        System.out.println("\nWrong input!");
-                        continue;
-                    }
-
-                    if (!selectedEvent.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
-                        System.out.println("\nThat ticket has already been purchased!");
-                        continue;
-                    }
-
-                    break;
-                }
-
-
-                try {
-                    Ticket boughtTicket = selectedEvent.book(rowNumberToBuy, seatNumberToBuy, discountCode);
-                    System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
-                } catch (AlreadyBookedException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        } catch (InputMismatchException e) {
-            System.out.println("Please enter something valid!");
         }
 
+
+        Room room = selectedEvent.getRoom();
+
+        System.out.println("How many tickets do you want to buy?");
+
+        while (true) {
+            try {
+                amountToBuy = scanner.nextInt();
+                while (amountToBuy > room.getAllSeatsInHall()) {
+                    System.out.println("The room for this event doesn't support that much seats.\nPlease enter again:");
+                    amountToBuy = scanner.nextInt();
+                }
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number!");
+                scanner.next();
+            }
+        }
+
+        for (int i = 1; i <= amountToBuy; i++) {
+            System.out.println("What kind of ticket do you want to buy?\n1. Regular\n2. Child\n3. Senior\n4. Student\n0. Cancel");
+
+            while (true) {
+                try {
+                    discountCode = scanner.nextInt();
+
+                    if (discountCode == 0) {
+                        return;
+                    }
+
+                    while (discountCode < 1 || discountCode > 4) {
+                        System.out.println("Invalid input, enter again: ");
+                        discountCode = scanner.nextInt();
+                    }
+                    break;
+                } catch (InputMismatchException e) {
+                    System.out.println("Please enter a valid number:");
+                    scanner.next();
+                }
+            }
+
+
+            room.printSeatingChart();
+
+            while (true) {
+                System.out.println("\nEnter the row and seat you would like to book for this event:");
+                rowNumberToBuy = scanner.nextInt();
+                seatNumberToBuy = scanner.nextInt();
+
+                if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
+                    System.out.println("\nWrong input!");
+                    continue;
+                }
+
+                if (!selectedEvent.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
+                    System.out.println("\nThat ticket has already been purchased!");
+                    continue;
+                }
+
+                break;
+            }
+            try {
+                Ticket boughtTicket = megaplexx.book(selectedEvent, rowNumberToBuy, seatNumberToBuy, discountCode);
+                System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
+            } catch (AlreadyBookedException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public void refundTicketForEvent() {
@@ -229,33 +263,54 @@ public class Main {
 
         System.out.println("What event would you like to refund?");
 
-        int choice = scanner.nextInt();
-
-        while (choice < 1 || choice > sorted.size()) {
-            System.out.println("Please enter a valid event!");
-            choice = scanner.nextInt();
+        int choice;
+        while (true) {
+            try {
+                choice = scanner.nextInt();
+                while (choice < 1 || choice > sorted.size()) {
+                    System.out.println("Please enter a valid event!");
+                    choice = scanner.nextInt();
+                }
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number:");
+                scanner.next();
+            }
         }
+
 
         CinemaEvent selected = sorted.get(choice - 1);
 
         Room room = selected.getRoom();
         room.printSeatingChart();
 
-        System.out.println("\nEnter a row:");
-        int rowToRefund = scanner.nextInt();
-        System.out.println("Enter a seat:");
-        int seatToRefund = scanner.nextInt();
+        int rowToRefund;
+        int seatToRefund;
 
-        while (!selected.isValidSeat(rowToRefund, seatToRefund)) {
-            System.out.println("Invalid input, enter again:");
-            System.out.println("Enter a row:");
-            rowToRefund = scanner.nextInt();
-            System.out.println("Enter a seat:");
-            seatToRefund = scanner.nextInt();
+        while (true) {
+            try {
+                System.out.println("\nEnter a row:");
+                rowToRefund = scanner.nextInt();
+                System.out.println("Enter a seat:");
+                seatToRefund = scanner.nextInt();
+
+                while (!selected.isValidSeat(rowToRefund, seatToRefund)) {
+                    System.out.println("Invalid input, enter again:");
+                    System.out.println("Enter a row:");
+                    rowToRefund = scanner.nextInt();
+                    System.out.println("Enter a seat:");
+                    seatToRefund = scanner.nextInt();
+                }
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter valid numbers:");
+                scanner.next();
+            }
         }
 
+
         try {
-            Ticket refunded = selected.refund(rowToRefund, seatToRefund);
+            Ticket refunded = megaplexx.refund(selected, rowToRefund, seatToRefund);
             System.out.printf("Refunded: $%.2f%n", refunded.price());
         } catch (NotBookedException e) {
             System.out.println("Seat " + seatToRefund + " in row " + rowToRefund + " has not been booked yet!");
@@ -338,24 +393,26 @@ public class Main {
 
         System.out.println("Which event would you like to see the rooms for?");
 
-        String eventToShowStr;
 
-        while (!scanner.hasNextInt()) {
-            System.out.println("Please enter a valid number");
-            scanner.next();
+        int eventToShow;
+        CinemaEvent selectedEvent;
+        while (true) {
+            try {
+                eventToShow = scanner.nextInt();
+                selectedEvent = sorted.get(eventToShow - 1);
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number!");
+                scanner.next();
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Please enter a number from 1 - 4!");
+            }
         }
-        eventToShowStr = scanner.next();
-        int eventToShow = Integer.parseInt(eventToShowStr);
 
 
-        while (eventToShow < 1 || eventToShow > sorted.size()) {
-            System.out.println("Please enter a valid event!");
-            eventToShow = scanner.nextInt();
-        }
+        Room selectedRoom = selectedEvent.getRoom();
 
-        CinemaEvent selectedEvent = sorted.get(eventToShow - 1);
-        Room room = selectedEvent.getRoom();
-        room.printSeatingChart();
+        selectedRoom.printSeatingChart();
     }
 
     public void showAdminPanel() {
@@ -371,18 +428,28 @@ public class Main {
     }
 
     public void buySnacks() {
-        int snackChoice;
-
         System.out.println("What snack would you like to buy?");
         megaplexx.printSnackMenu();
-        snackChoice = scanner.nextInt();
 
-        while (snackChoice < 1 || snackChoice > megaplexx.getSnacks().size()) {
-            System.out.println("Invalid choice, enter again:");
-            snackChoice = scanner.nextInt();
+        int snackChoice;
+        while (true) {
+            try {
+                snackChoice = scanner.nextInt();
+                if (snackChoice >= 1 && snackChoice <= megaplexx.getSnacks().size()) {
+                    break;
+                }
+                System.out.println("Invalid choice, enter again:");
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number!");
+                scanner.next();
+            }
         }
-        megaplexx.buySnack((String) megaplexx.getSnacks().keySet().toArray()[snackChoice - 1]);
+
+        ArrayList<Object> namesInOrder = new ArrayList<>(megaplexx.getSnacks().keySet());
+        String chosen = namesInOrder.get(snackChoice - 1).toString();
+        megaplexx.buySnack(chosen);
     }
+
 
     public void showAllTicketsPerEvent() {
         for (CinemaEvent event : megaplexx.getEvents()) {

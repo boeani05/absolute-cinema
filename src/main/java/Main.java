@@ -222,19 +222,26 @@ public class Main {
 
             while (true) {
                 System.out.println("\nEnter the row and seat you would like to book for this event:");
-                rowNumberToBuy = scanner.nextInt();
-                seatNumberToBuy = scanner.nextInt();
+                while (true) {
+                    try {
+                        rowNumberToBuy = scanner.nextInt();
+                        seatNumberToBuy = scanner.nextInt();
+                        if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
+                            System.out.println("\nWrong input!");
+                            continue;
+                        }
 
-                if (!selectedEvent.isValidSeat(rowNumberToBuy, seatNumberToBuy)) {
-                    System.out.println("\nWrong input!");
-                    continue;
+                        if (!selectedEvent.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
+                            System.out.println("\nThat ticket has already been purchased!");
+                            continue;
+                        }
+
+                        break;
+                    } catch (InputMismatchException e) {
+                        System.out.println("Please enter a valid number!");
+                        scanner.next();
+                    }
                 }
-
-                if (!selectedEvent.isSeatAvailable(rowNumberToBuy, seatNumberToBuy)) {
-                    System.out.println("\nThat ticket has already been purchased!");
-                    continue;
-                }
-
                 break;
             }
             try {
@@ -435,6 +442,10 @@ public class Main {
         while (true) {
             try {
                 snackChoice = scanner.nextInt();
+                if (snackChoice == 0) {
+                    return;
+                }
+
                 if (snackChoice >= 1 && snackChoice <= megaplexx.getSnacks().size()) {
                     break;
                 }

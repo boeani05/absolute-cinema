@@ -217,6 +217,7 @@ public class Cinema {
         for (Map.Entry<String, Double> entry : snacks.entrySet()) {
             System.out.printf("%d. %s: $%.2f%n", counter++, entry.getKey(), entry.getValue());
         }
+        System.out.println("0. Cancel");
     }
 
     public void buySnack(String name) {

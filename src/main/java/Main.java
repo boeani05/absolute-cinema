@@ -6,8 +6,10 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class Main {
-    private Cinema megaplexx;
+    private Map<String, ICinema> cinemas;
     private Scanner scanner;
+
+    private ICinema chosenCinema;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -16,14 +18,32 @@ public class Main {
 
     private void start() {
         scanner = new Scanner(System.in);
-        megaplexx = new Cinema();
+        cinemas = new HashMap<>();
 
-        megaplexx.addSnack("Popcorn", 5.99);
-        megaplexx.addSnack("Soda", 1.99);
-        megaplexx.addSnack("Nachos", 3.99);
+        cinemas.put("chosenCinema", new MegaPlexx());
+        cinemas.put("cineplexx", new CinePlexx());
 
 
-        System.out.println("Welcome to Megaplexx!");
+        int choice;
+        while (true) {
+            try {
+                choice = scanner.nextInt();
+                switch (choice) {
+                    case 1 -> chosenCinema = cinemas.get("chosenCinema");
+                    case 2 -> chosenCinema = cinemas.get("cineplexx");
+                    default -> {
+                        System.out.println("Please enter a valid number!");
+                        continue;
+                    }
+                }
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a valid number!");
+                scanner.next();
+            }
+        }
+
+        System.out.println("Welcome to " + chosenCinema.getName() + "!");
 
         System.out.println("""
                 
@@ -39,7 +59,6 @@ public class Main {
                 0. Exit
                 """);
 
-        int choice;
         while (true) {
             try {
                 choice = scanner.nextInt();
@@ -107,7 +126,7 @@ public class Main {
                 }
             }
         }
-        System.out.println("Thank you for visiting Megaplexx! Goodbye!");
+        System.out.println("Thank you for visiting chosenCinema! Goodbye!");
     }
 
     private void printStatistics() {
@@ -127,10 +146,10 @@ public class Main {
 
         switch (choiceStatistics) {
             case 1:
-                System.out.println(megaplexx.getAllStatistics());
+                System.out.println(chosenCinema.getAllStatistics());
                 break;
             case 2:
-                System.out.println(megaplexx.getPerRoomStatisticsTable());
+                System.out.println(chosenCinema.getPerRoomStatisticsTable());
                 break;
             default:
                 System.out.println("Invalid choice. Please try again.");
@@ -145,7 +164,7 @@ public class Main {
         int amountToBuy;
         int discountCode;
         int counter;
-        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        List<CinemaEvent> sorted = new ArrayList<>(chosenCinema.getEvents());
         sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
         counter = 1;
 
@@ -245,7 +264,7 @@ public class Main {
                 break;
             }
             try {
-                Ticket boughtTicket = megaplexx.book(selectedEvent, rowNumberToBuy, seatNumberToBuy, discountCode);
+                Ticket boughtTicket = chosenCinema.book(selectedEvent, rowNumberToBuy, seatNumberToBuy, discountCode);
                 System.out.println("Ticket price: $" + String.format("%.2f", boughtTicket.price()));
             } catch (AlreadyBookedException e) {
                 System.out.println(e.getMessage());
@@ -254,7 +273,7 @@ public class Main {
     }
 
     public void refundTicketForEvent() {
-        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        List<CinemaEvent> sorted = new ArrayList<>(chosenCinema.getEvents());
         sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
 
         if (sorted.isEmpty()) {
@@ -317,7 +336,7 @@ public class Main {
 
 
         try {
-            Ticket refunded = megaplexx.refund(selected, rowToRefund, seatToRefund);
+            Ticket refunded = chosenCinema.refund(selected, rowToRefund, seatToRefund);
             System.out.printf("Refunded: $%.2f%n", refunded.price());
         } catch (NotBookedException e) {
             System.out.println("Seat " + seatToRefund + " in row " + rowToRefund + " has not been booked yet!");
@@ -327,7 +346,7 @@ public class Main {
 
     public void showAllEvents() {
         int counter = 1;
-        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        List<CinemaEvent> sorted = new ArrayList<>(chosenCinema.getEvents());
         sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
 
         LocalDate currentDate = null;
@@ -357,7 +376,7 @@ public class Main {
         }
 
         List<CinemaEvent> eventsOnDate = new ArrayList<>();
-        for (CinemaEvent event : megaplexx.getEvents()) {
+        for (CinemaEvent event : chosenCinema.getEvents()) {
             if (event.getStartTime().toLocalDate().equals(date)) {
                 eventsOnDate.add(event);
             }
@@ -365,7 +384,7 @@ public class Main {
 
         //TODO: add events of the entered date
 
-        for (CinemaEvent event : megaplexx.getUpcomingEvents(LocalDateTime.now(), LocalDateTime.now().plusDays(7))) {
+        for (CinemaEvent event : chosenCinema.getUpcomingEvents(LocalDateTime.now(), LocalDateTime.now().plusDays(7))) {
             if (event.getStartTime().toLocalDate().equals(date)) {
                 eventsOnDate.add(event);
             }
@@ -388,7 +407,7 @@ public class Main {
     }
 
     public void showRoomsForEvent() {
-        List<CinemaEvent> sorted = new ArrayList<>(megaplexx.getEvents());
+        List<CinemaEvent> sorted = new ArrayList<>(chosenCinema.getEvents());
         sorted.sort(Comparator.comparing(CinemaEvent::getStartTime));
         int counter = 1;
 
@@ -423,20 +442,26 @@ public class Main {
     }
 
     public void showAdminPanel() {
-        System.out.println("Enter username:");
-        String username = scanner.next();
-        System.out.println("Enter password:");
-        String password = scanner.next();
-        if (!megaplexx.authenticateAdmin(username, password)) {
-            System.out.println("Invalid credentials!");
-            return;
+        if (chosenCinema instanceof IAdminSupport adminSupport) {
+            System.out.println("Enter username:");
+            String username = scanner.next();
+            System.out.println("Enter password:");
+            String password = scanner.next();
+            if (!adminSupport.authenticateAdmin(username, password)) {
+                System.out.println("Invalid credentials!");
+                return;
+            }
+            adminSupport.printAdminView();
+        } else {
+            System.out.println("No admin support for " + chosenCinema.getName());
+
         }
-        megaplexx.printAdminView();
+
     }
 
     public void buySnacks() {
         System.out.println("What snack would you like to buy?");
-        megaplexx.printSnackMenu();
+        chosenCinema.printSnackMenu();
 
         int snackChoice;
         while (true) {
@@ -446,7 +471,7 @@ public class Main {
                     return;
                 }
 
-                if (snackChoice >= 1 && snackChoice <= megaplexx.getSnacks().size()) {
+                if (snackChoice >= 1 && snackChoice <= chosenCinema.getSnacks().size()) {
                     break;
                 }
                 System.out.println("Invalid choice, enter again:");
@@ -456,14 +481,14 @@ public class Main {
             }
         }
 
-        ArrayList<Object> namesInOrder = new ArrayList<>(megaplexx.getSnacks().keySet());
+        ArrayList<Object> namesInOrder = new ArrayList<>(chosenCinema.getSnacks().keySet());
         String chosen = namesInOrder.get(snackChoice - 1).toString();
-        megaplexx.buySnack(chosen);
+        chosenCinema.buySnack(chosen);
     }
 
 
     public void showAllTicketsPerEvent() {
-        for (CinemaEvent event : megaplexx.getEvents()) {
+        for (CinemaEvent event : chosenCinema.getEvents()) {
             int soldTicketsCounter = event.getSoldTickets();
             System.out.println("Tickets for event " + event.getRoom().getRoomId() + ": " + soldTicketsCounter + " sold tickets.");
             System.out.println();

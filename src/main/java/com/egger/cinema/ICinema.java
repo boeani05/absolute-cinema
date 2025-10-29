@@ -1,6 +1,7 @@
 package com.egger.cinema;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -108,4 +109,11 @@ public interface ICinema {
      * @param chosen the snack identifier (e.g. name or id) as expected by {@link #getSnacks()}
      */
     void buySnack(String chosen);
+
+    /**
+     * Returns all events as a collection of {@link CinemaEvent} objects.
+     *
+     * @return a collection of events (never null)
+     */
+    Collection<CinemaEvent> getAllEvents();
 }

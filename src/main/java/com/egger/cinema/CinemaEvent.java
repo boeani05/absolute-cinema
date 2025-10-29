@@ -104,7 +104,6 @@ public class CinemaEvent {
         return startTime;
     }
 
-    @SuppressWarnings("unused")
     public Instant getDateTime() {
         return startTime.atZone(java.time.ZoneId.systemDefault()).toInstant();
     }

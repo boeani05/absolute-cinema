@@ -7,35 +7,24 @@ import java.util.Comparator;
 
 import static org.junit.Assert.*;
 
-public class CinemaTest {
+public class MegaPlexxTest {
 
-    private AbstractCinema cinema;
+    private MegaPlexx cinema;
     private CinemaEvent event;
     private int row;
     private int seat;
 
     @Before
     public void setUp() {
-        cinema = new AbstractCinema() {
-            @Override
-            public String getName() {
-                return "";
-            }
+        cinema = new MegaPlexx();
 
-            @Override
-            protected void loadData() {
-
-            }
-        };
-
-        event = cinema.getEvents().stream()
-                .min(Comparator.comparing(CinemaEvent::getStartTime))
-                .orElseThrow(() -> new AssertionError("No events initialized"));
+        event = cinema.getAllEvents().stream()
+                .min(Comparator.comparing(CinemaEvent::getEventDateTime))
+                .orElseThrow(() -> new IllegalStateException("No events available in cinema"));
 
         row = 1;
         seat = 1;
 
-        assertTrue("Precondition: seat must be valid", event.isValidSeat(row, seat));
     }
 
     @Test
@@ -138,21 +127,12 @@ public class CinemaTest {
         assertNotNull(allStats);
         assertFalse(allStats.trim().isEmpty());
     }
-
-
-    // testdaten manuell erstellen
-
-    //cinema.setData(null, null, null);
-
-    // ein vorher erstelletes event wählen
-
-    // eine buchung durchführen
-    //cinema.book()
-
-    // check
-
-    // 1. doppelbuchung?
-    // 2. statistiken?
-    // 3. rabatte?
+    
+    @Test
+    public void adminAccess() {
+        assertTrue(cinema.isAdminAccess("admin", "password123"));
+        assertFalse(cinema.isAdminAccess("admin", "wrongpassword"));
+        assertFalse(cinema.isAdminAccess("wronguser", "password123"));
+    }
 
 }

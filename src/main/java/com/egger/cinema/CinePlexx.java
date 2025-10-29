@@ -1,5 +1,8 @@
 package com.egger.cinema;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class CinePlexx extends AbstractCinema {
 
     public CinePlexx() {
@@ -9,6 +12,11 @@ public class CinePlexx extends AbstractCinema {
     @Override
     public String getName() {
         return "CinePlexx";
+    }
+
+    @Override
+    public Collection<CinemaEvent> getAllEvents() {
+        return Collections.unmodifiableList(events);
     }
 
     @Override

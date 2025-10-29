@@ -1,5 +1,8 @@
 package com.egger.cinema;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class MegaPlexx extends AbstractCinema implements IAdminSupport {
     private final static String ADMIN_USERNAME = "admin";
     private final static String ADMIN_PASSWORD = "password123";
@@ -11,6 +14,19 @@ public class MegaPlexx extends AbstractCinema implements IAdminSupport {
     @Override
     public String getName() {
         return "MegaPlexx";
+    }
+
+    @Override
+    public Collection<CinemaEvent> getAllEvents() {
+        return Collections.unmodifiableList(events);
+    }
+
+    @Override
+    public boolean isAdminAccess(String admin123, String password123) {
+        if (admin123.equals("admin") && password123.equals("password123")) {
+            return true;
+        }
+        return false;
     }
 
     @Override

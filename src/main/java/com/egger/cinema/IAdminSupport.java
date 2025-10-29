@@ -14,4 +14,6 @@ public interface IAdminSupport {
      * Prints the admin view, displaying all movies and their details.
      */
     void printAdminView();
+
+    boolean isAdminAccess(String username, String password);
 }

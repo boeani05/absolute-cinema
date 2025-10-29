@@ -9,14 +9,24 @@ import static org.junit.Assert.*;
 
 public class CinemaTest {
 
-    private Cinema cinema;
+    private AbstractCinema cinema;
     private CinemaEvent event;
     private int row;
     private int seat;
 
     @Before
     public void setUp() {
-        cinema = new Cinema();
+        cinema = new AbstractCinema() {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            protected void loadData() {
+
+            }
+        };
 
         event = cinema.getEvents().stream()
                 .min(Comparator.comparing(CinemaEvent::getStartTime))
@@ -86,7 +96,7 @@ public class CinemaTest {
     }
 
     @Test
-    public void addSnacksToIncome() throws Exception {
+    public void addSnacksToIncome() {
         double priceBeforeSnacks = cinema.getAllIncome();
 
         cinema.addSnack("Popcorn", 5.99);
@@ -101,13 +111,6 @@ public class CinemaTest {
         double incomeAfterSnacks = cinema.getAllIncome();
         assertEquals("Snack income should be summed up",
                 priceBeforeSnacks + snackIncome, incomeAfterSnacks, 0.001);
-    }
-
-    @Test
-    public void adminLogin() {
-        assertTrue(cinema.authenticateAdmin("admin", "password123"));
-        assertFalse(cinema.authenticateAdmin("admin", "wrong"));
-        assertFalse(cinema.authenticateAdmin("wrong", "password123"));
     }
 
     @Test

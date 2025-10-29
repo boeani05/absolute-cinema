@@ -14,6 +14,14 @@ public class CinemaEvent {
     private final LocalDateTime startTime;
     private final Map<SeatId, Ticket> bookings;
 
+    /*
+     {
+       "guid": "xxxx", <- event GUID
+       "roomGuid" : "yyy",
+       "movieGuid" : "zzzz";
+     }
+     */
+
     public CinemaEvent(Movie movie, Room room, LocalDateTime startTime) {
         this.movie = movie;
         this.room = room;

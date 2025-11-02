@@ -3,16 +3,14 @@ package com.egger.cinema;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class Mockdata {
 
@@ -47,7 +45,8 @@ public class Mockdata {
                 if (isBlank(title)) {
                     throw new IllegalArgumentException("Movie entry missing title/movieName");
                 }
-                String id = isBlank(r.id) ? slugify(title) : r.id;
+
+                UUID id = parseUuidOrThrow(r.id);
                 int duration = requirePositive(r.durationMinutes);
                 double basePrice = requireNonNegative(r.basePrice);
                 double rating = requireInRange(r.rating);
@@ -86,7 +85,6 @@ public class Mockdata {
         }
 
         rooms = new TreeMap<>();
-        events = new ArrayList<>();
 
         boughtSnacks = new LinkedHashMap<>();
 
@@ -115,7 +113,7 @@ public class Mockdata {
         rooms.put("C", c);
         rooms.put("D", d);
 
-        events.addAll(List.of(e1, e2, e3, e4));
+        events = new ArrayList<>(List.of(e1, e2, e3, e4));
 
         DiscountCode d1 = new DiscountCode(1, 0.0);
         DiscountCode d2 = new DiscountCode(2, 2.99);
@@ -143,7 +141,7 @@ public class Mockdata {
     }
 
     private static String requireNonBlank(String s) {
-        if (isBlank(s)) throw new IllegalArgumentException("Missing or blank field: " + "genre");
+        if (isBlank(s)) throw new IllegalArgumentException("genre required");
         return s;
     }
 
@@ -164,12 +162,12 @@ public class Mockdata {
     }
 
 
-    private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
-
-    private static String slugify(String s) {
-        String lower = s.toLowerCase(Locale.ROOT);
-        String slug = NON_ALNUM.matcher(lower).replaceAll("-");
-        slug = slug.replaceAll("(^-+|-+$)", "");
-        return slug.isEmpty() ? "movie-" + UUID.randomUUID() : slug;
+    private static UUID parseUuidOrThrow(String value) {
+        if (value == null || value.isBlank()) throw new IllegalArgumentException("Move.id is required");
+        try {
+            return UUID.fromString(value);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid UUID: " + value);
+        }
     }
 }

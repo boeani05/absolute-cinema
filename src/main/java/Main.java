@@ -6,7 +6,6 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class Main {
-    private Map<String, ICinema> cinemas;
     private Scanner scanner;
 
     private ICinema chosenCinema;
@@ -18,12 +17,13 @@ public class Main {
 
     private void start() {
         scanner = new Scanner(System.in);
-        cinemas = new HashMap<>();
+        Map<String, ICinema> cinemas = new HashMap<>();
 
-        cinemas.put("chosenCinema", new MegaPlexx());
+        cinemas.put("megaplexx", new MegaPlexx());
         cinemas.put("cineplexx", new CinePlexx());
 
 
+        System.out.println("1.) Megaplexx\n2.) Cineplexx");
         int choice;
         while (true) {
             try {

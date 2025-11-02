@@ -1,7 +1,9 @@
 package com.egger.cinema;
 
+import java.util.UUID;
+
 public record Movie(
-        String id,
+        UUID id,
         String title,
         int durationMinutes,
         double basePrice,
@@ -9,8 +11,8 @@ public record Movie(
         String genre
 ) {
     public Movie {
-        if (id == null || id.isBlank()) throw new IllegalArgumentException("Movie.id is required!");
-        if (title == null || title.isBlank()) throw new IllegalArgumentException("Move.title is required!");
+        if (id == null) throw new IllegalArgumentException("Movie.id is required!");
+        if (title == null || title.isBlank()) throw new IllegalArgumentException("Movie.title is required!");
         if (durationMinutes <= 0) throw new IllegalArgumentException("duration must be > 0");
         if (basePrice < 0) throw new IllegalArgumentException("basePrice must be >= 0");
         if (rating < 0 || rating > 10) throw new IllegalArgumentException("rating must be 0..10");

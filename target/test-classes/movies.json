@@ -1,6 +1,6 @@
 [
   {
-    "guid" : "123E4567-E89B-12D3-A456-426614174000",
+    "id" : "123E4567-E89B-12D3-A456-426614174000",
     "title": "Inception",
     "durationMinutes": 148,
     "basePrice": 12.99,
@@ -8,7 +8,7 @@
     "genre": "Science Fiction"
   },
   {
-    "guid" : "6B29FC40-CA47-1067-B31D-00DD010662DA",
+    "id" : "6B29FC40-CA47-1067-B31D-00DD010662DA",
     "title": "The Godfather",
     "durationMinutes": 175,
     "basePrice": 14.99,
@@ -16,7 +16,7 @@
     "genre": "Crime"
   },
   {
-    "guid" : "7C9E6679-7425-40DE-944B-E07FC1F90AE7",
+    "id" : "7C9E6679-7425-40DE-944B-E07FC1F90AE7",
     "title": "Pulp Fiction",
     "durationMinutes": 154,
     "basePrice": 13.99,
@@ -24,7 +24,7 @@
     "genre": "Crime"
   },
   {
-    "guid" : "550E8400-E29B-41D4-A716-446655440000",
+    "id" : "550E8400-E29B-41D4-A716-446655440000",
     "title": "The Dark Knight",
     "durationMinutes": 152,
     "basePrice": 15.99,
@@ -32,7 +32,7 @@
     "genre": "Action"
   },
   {
-    "guid" : "F47AC10B-58CC-4372-A567-0E02B2C3D479",
+    "id" : "F47AC10B-58CC-4372-A567-0E02B2C3D479",
     "title": "Forrest Gump",
     "durationMinutes": 142,
     "basePrice": 11.99,
@@ -40,7 +40,7 @@
     "genre": "Drama"
   },
   {
-    "guid" : "9A5B8C3D-1F4E-4D2A-8F3B-2C3D4E5F6A7B",
+    "id" : "9A5B8C3D-1F4E-4D2A-8F3B-2C3D4E5F6A7B",
     "title": "The Matrix",
     "durationMinutes": 136,
     "basePrice": 13.49,
@@ -48,7 +48,7 @@
     "genre": "Science Fiction"
   },
   {
-    "guid" : "3F2504E0-4F89-11D3-9A0C-0305E82C3301",
+    "id" : "3F2504E0-4F89-11D3-9A0C-0305E82C3301",
     "title": "Interstellar",
     "durationMinutes": 169,
     "basePrice": 16.99,
@@ -56,7 +56,7 @@
     "genre": "Science Fiction"
   },
   {
-    "guid" : "1B4E28BA-2FA1-11D2-883F-0016D3CCA427",
+    "id" : "1B4E28BA-2FA1-11D2-883F-0016D3CCA427",
     "title": "Gladiator",
     "durationMinutes": 155,
     "basePrice": 12.49,
@@ -64,7 +64,7 @@
     "genre": "Action"
   },
   {
-    "guid" : "D94F3F01-2C8C-4A6D-9F3D-3C4D5E6F7A8B",
+    "id" : "D94F3F01-2C8C-4A6D-9F3D-3C4D5E6F7A8B",
     "title": "The Shawshank Redemption",
     "durationMinutes": 142,
     "basePrice": 10.99,
@@ -72,7 +72,7 @@
     "genre": "Drama"
   },
   {
-    "guid" : "A1234567-B89C-12D3-E456-426614174000",
+    "id" : "A1234567-B89C-12D3-E456-426614174000",
     "title": "Fight Club",
     "durationMinutes": 139,
     "basePrice": 11.49,
@@ -80,7 +80,7 @@
     "genre": "Drama"
   },
   {
-    "guid" : "B2345678-C89D-23E4-F567-526614174001",
+    "id" : "B2345678-C89D-23E4-F567-526614174001",
     "title": "The Lord of the Rings: The Fellowship of the Ring",
     "durationMinutes": 178,
     "basePrice": 14.49,
@@ -88,7 +88,7 @@
     "genre": "Fantasy"
   },
   {
-    "guid" : "C3456789-D89E-34F5-G678-626614174002",
+    "id" : "C3456789-D89E-34F5-A678-626614174002",
     "title": "Avatar",
     "durationMinutes": 162,
     "basePrice": 13.99,
@@ -96,7 +96,7 @@
     "genre": "Science Fiction"
   },
   {
-    "guid" : "D4567890-E89F-45G6-H789-726614174003",
+    "id" : "D4567890-E89F-45A6-A789-726614174003",
     "title": "Titanic",
     "durationMinutes": 195,
     "basePrice": 12.99,
